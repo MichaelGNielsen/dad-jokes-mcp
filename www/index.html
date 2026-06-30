@@ -153,7 +153,8 @@ function render() {
   empty.style.display = "none";
   list.innerHTML = filtered.map(j => {
     const tag = classify(j);
-    return `<li><span class="tag tag-${tag}">${tag}</span>${escapeHtml(j)}</li>`;
+    const body = escapeHtml(j).replace(/\n/g, "<br>\n");
+    return `<li><span class="tag tag-${tag}">${tag}</span>${body}</li>`;
   }).join("");
 }
 
