@@ -96,10 +96,7 @@ async function fetchRandomJoke() {
 // HTTP Server
 const app = express();
 app.use(express.json({ limit: "10mb" }));
-
-app.get("/", (req, res) => {
-  res.send("Dad Jokes MCP Streamable HTTP Server 😄");
-});
+app.use(express.static(WWW_DIR));
 
 // Main MCP endpoint
 app.post("/mcp", async (req, res) => {
@@ -239,12 +236,19 @@ app.post("/mcp", async (req, res) => {
       let toolResponse;
 
       if (name === "get_random_joke") {
-        const joke = await fetchRandomJoke();
-        if (!allJokes.includes(joke)) {
-          allJokes.unshift(joke);
-          await saveJokes();
+        try {
+          const joke = await fetchRandomJoke();
+          if (!allJokes.includes(joke)) {
+            allJokes.unshift(joke);
+            await saveJokes();
+          }
+          toolResponse = { content: [{ type: "text", text: `😄 ${joke}` }] };
+        } catch (err) {
+          toolResponse = {
+            content: [{ type: "text", text: `Failed to fetch joke: ${err.message}` }],
+            isError: true,
+          };
         }
-        toolResponse = { content: [{ type: "text", text: `😄 ${joke}` }] };
       } else if (name === "get_multiple_jokes") {
         const count = Math.min(args.count || 5, 20);
         const jokes = [];

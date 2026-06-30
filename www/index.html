@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dad Jokes</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0d1117; color: #c9d1d9; min-height: 100vh;
+  }
+  .container { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  h1 { font-size: 1.5rem; color: #f0c040; }
+  .stats { color: #8b949e; font-size: 0.875rem; }
+  .stats span { color: #c9d1d9; font-weight: 600; }
+
+  .controls {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;
+  }
+  .controls button, .controls select {
+    padding: 0.5rem 1rem; border: 1px solid #30363d; border-radius: 6px;
+    background: #21262d; color: #c9d1d9; cursor: pointer; font-size: 0.875rem;
+  }
+  .controls button:hover { background: #30363d; }
+  .controls button.primary { background: #238636; border-color: #2ea043; }
+  .controls button.primary:hover { background: #2ea043; }
+  .controls input {
+    flex: 1; min-width: 160px; padding: 0.5rem 0.75rem;
+    border: 1px solid #30363d; border-radius: 6px;
+    background: #0d1117; color: #c9d1d9; font-size: 0.875rem;
+  }
+
+  .joke-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .joke-list li {
+    background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+    padding: 0.75rem 1rem; font-size: 0.9375rem; line-height: 1.5;
+  }
+  .joke-list li .tag {
+    display: inline-block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+    padding: 0.15rem 0.5rem; border-radius: 99px; margin-right: 0.5rem;
+  }
+  .tag-programming { background: #1f6feb22; color: #58a6ff; border: 1px solid #1f6feb44; }
+  .tag-chuck { background: #da363322; color: #ff7b72; border: 1px solid #da363344; }
+  .tag-dad { background: #23863622; color: #3fb950; border: 1px solid #23863644; }
+  .tag-general { background: #21262d; color: #8b949e; border: 1px solid #30363d; }
+  .tag-none { background: #21262d22; color: #484f58; border: 1px solid #21262d44; }
+
+  .empty { text-align: center; color: #484f58; padding: 3rem 1rem; font-size: 1rem; }
+  .toast {
+    position: fixed; bottom: 1.5rem; right: 1.5rem;
+    background: #238636; color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px;
+    font-size: 0.875rem; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  }
+  .toast.error { background: #da3633; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>😄 Dad Jokes</h1>
+    <div class="stats"><span id="count">0</span> jokes in pool</div>
+  </header>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search jokes..." autocomplete="off">
+    <select id="category">
+      <option value="">All categories</option>
+      <option value="programming">Programming</option>
+      <option value="chuck">Chuck Norris</option>
+      <option value="dad">Dad</option>
+      <option value="general">General</option>
+    </select>
+    <button class="primary" id="btn-random">🎲 Random</button>
+    <button class="primary" id="btn-batch">➕ Add 5</button>
+    <button id="btn-clear">🗑 Clear</button>
+    <button id="btn-refresh">🔄</button>
+  </div>
+
+  <ul class="joke-list" id="joke-list"></ul>
+  <div class="empty" id="empty">No jokes yet. Click 🎲 Random to fetch one!</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const MCP = "http://localhost:5000/mcp";
+
+let allJokes = [];
+let filterText = "";
+let filterCategory = "";
+
+const CATEGORY_RULES = [
+  { name: "chuck",    match: /chuck\s*norris/i },
+  { name: "dad",      match: /(dad|why did the|what do you call|knock knock|a man walks|walked into a)/i },
+  { name: "programming", match: /(code|bug|programmer|computer|javascript|html|css|python|java|ruby|function|variable|server|database|linux|windows|apple|google|algorithm|developer|syntax|object|class|api|json|git)/i },
+];
+
+function classify(joke) {
+  for (const r of CATEGORY_RULES) {
+    if (r.match.test(joke)) return r.name;
+  }
+  return "general";
+}
+
+async function mcp(method, params = {}) {
+  const res = await fetch(MCP, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.result;
+}
+
+async function loadJokes() {
+  try {
+    const result = await mcp("tools/call", { name: "get_all_jokes", arguments: {} });
+    const text = result.content[0].text;
+    if (text.startsWith("No jokes")) {
+      allJokes = [];
+    } else {
+      allJokes = text.split("\n\n").slice(1).map(line => line.replace(/^\d+\.\s*/, "")).filter(Boolean);
+    }
+    render();
+  } catch (e) {
+    toast("Failed to load jokes: " + e.message, true);
+  }
+}
+
+function render() {
+  const filtered = allJokes.filter(j => {
+    if (filterCategory && classify(j) !== filterCategory) return false;
+    if (filterText && !j.toLowerCase().includes(filterText.toLowerCase())) return false;
+    return true;
+  });
+
+  document.getElementById("count").textContent = allJokes.length;
+  const list = document.getElementById("joke-list");
+  const empty = document.getElementById("empty");
+
+  if (filtered.length === 0) {
+    list.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  list.innerHTML = filtered.map(j => {
+    const tag = classify(j);
+    return `<li><span class="tag tag-${tag}">${tag}</span>${escapeHtml(j)}</li>`;
+  }).join("");
+}
+
+function escapeHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+async function fetchRandom() {
+  try {
+    const result = await mcp("tools/call", { name: "get_random_joke", arguments: {} });
+    const text = result.content[0].text;
+    toast(text.replace("😄 ", ""));
+    await loadJokes();
+  } catch (e) {
+    toast("Error: " + e.message, true);
+  }
+}
+
+async function batchAdd(n = 5) {
+  try {
+    const result = await mcp("tools/call", { name: "add_jokes", arguments: { count: n } });
+    const text = result.content[0].text;
+    toast(text.substring(0, 80) + (text.length > 80 ? "…" : ""));
+    await loadJokes();
+  } catch (e) {
+    toast("Error: " + e.message, true);
+  }
+}
+
+async function clearJokes() {
+  if (!confirm("Clear all jokes?")) return;
+  try {
+    await mcp("tools/call", { name: "clear_jokes", arguments: {} });
+    toast("Cleared all jokes");
+    await loadJokes();
+  } catch (e) {
+    toast("Error: " + e.message, true);
+  }
+}
+
+function toast(msg, isError = false) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast" + (isError ? " error" : "") + " show";
+  setTimeout(() => el.classList.remove("show"), 3000);
+}
+
+document.getElementById("search").addEventListener("input", e => {
+  filterText = e.target.value;
+  render();
+});
+document.getElementById("category").addEventListener("change", e => {
+  filterCategory = e.target.value;
+  render();
+});
+document.getElementById("btn-random").addEventListener("click", fetchRandom);
+document.getElementById("btn-batch").addEventListener("click", () => batchAdd(5));
+document.getElementById("btn-clear").addEventListener("click", clearJokes);
+document.getElementById("btn-refresh").addEventListener("click", loadJokes);
+
+loadJokes();
+</script>
+</body>
+</html>
