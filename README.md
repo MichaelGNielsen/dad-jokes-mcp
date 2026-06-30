@@ -55,42 +55,33 @@ Serveren (dad_jokes_mcp.mjs) modtager JSON via POST `/mcp`:
 ```javascript
 if (request.method === "tools/call") {
   const { name, arguments: args } = request.params;
-  
+
   // name = "get_multiple_jokes"
   // args = { count: 10 }
-  
-  if (name === "get_multiple_jokes") {
-    const count = Math.min(args.count || 5, 20);
-    // ... fetch 10 jokes ...
-  }
-}
-```
+
 
 **Step 4: Server matcher tool-navn og udfører**
 
-Serveren bruger en `if/else` chain til at matche tool-navn:
+Serveren bruger et **handler lookup-objekt** i stedet for if/else:
 
 ```javascript
-if (name === "get_random_joke") {
-  // Execute get_random_joke
-} else if (name === "get_multiple_jokes") {
-  // Execute get_multiple_jokes ← MATCH!
-} else if (name === "get_all_jokes") {
-  // Execute get_all_jokes
-} else if (name === "clear_jokes") {
-  // Execute clear_jokes
-} else if (name === "get_joke_category") {
-  // Execute get_joke_category
-} else if (name === "fill_jokes_batch") {
-  // Execute fill_jokes_batch
-} else if (name === "add_jokes") {
-  // Execute add_jokes
-} else if (name === "add_joke") {
-  // Execute add_joke
-} else if (name === "clean_jokes") {
-  // Execute clean_jokes
-} else if (name === "add_jokes") {
-  // Execute add_jokes
+const handlers = {
+  get_random_joke: async () => { /* ... */ },
+  get_multiple_jokes: async () => { /* ... */ },  // ← MATCH!
+  get_all_jokes: async () => { /* ... */ },
+  clear_jokes: async () => { /* ... */ },
+  get_joke_category: async () => { /* ... */ },
+  fill_jokes_batch: async () => { /* ... */ },
+  add_jokes: async () => { /* ... */ },
+  add_joke: async () => { /* ... */ },
+  clean_jokes: async () => { /* ... */ },
+};
+
+const handler = handlers[name];
+if (handler) {
+  toolResponse = await handler(args);
+} else {
+  toolResponse = { error: { code: -32601, message: `Tool not found: ${name}` } };
 }
 ```
 
@@ -134,12 +125,11 @@ Du skulle:
 }
 ```
 
-2. Tilføje handling i `tools/call`:
+2. Tilføje en key i `handlers`-objektet i `tools/call`:
 ```javascript
-else if (name === "my_new_tool") {
-  // Do something
-  toolResponse = { content: [{ type: "text", text: "Result" }] };
-}
+my_new_tool: async () => {
+  return { content: [{ type: "text", text: "Result" }] };
+},
 ```
 
 3. PA ville automatisk detektere den næste gang den kalder `tools/list`!

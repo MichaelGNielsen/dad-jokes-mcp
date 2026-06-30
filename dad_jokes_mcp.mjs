@@ -267,175 +267,145 @@ app.post("/mcp", async (req, res) => {
       };
     } else if (request.method === "tools/call") {
       const { name, arguments: args } = request.params;
-      let toolResponse;
 
-      if (name === "get_random_joke") {
-        try {
-          const joke = await fetchRandomJoke();
-          if (!allJokes.includes(joke)) {
-            allJokes.unshift(joke);
-            await saveJokes();
-          }
-          toolResponse = { content: [{ type: "text", text: `😄 ${joke}` }] };
-        } catch (err) {
-          toolResponse = {
-            content: [{ type: "text", text: `Failed to fetch joke: ${err.message}` }],
-            isError: true,
-          };
-        }
-      } else if (name === "get_multiple_jokes") {
-        const count = Math.min(args.count || 5, 20);
-        const jokes = [];
-        for (let i = 0; i < count; i++) {
-          try {
-            const joke = await fetchRandomJoke();
-            jokes.push(joke);
-            if (!allJokes.includes(joke)) {
-              allJokes.unshift(joke);
-            }
-          } catch (err) {
-            console.error(`Error fetching joke ${i + 1}:`, err);
-          }
-        }
-        await saveJokes();
-        let msg = `😄 ${jokes.length} Dad Jokes:\n\n`;
-        jokes.forEach((joke, i) => {
-          msg += `${i + 1}. ${joke}\n\n`;
-        });
-        toolResponse = { content: [{ type: "text", text: msg.trim() }] };
-      } else if (name === "server_status") {
-        const toolCount = 10;
-        toolResponse = {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              server: "dad-jokes-mcp",
-              version: "1.0.0",
-              protocol: "MCP 2024-11-05 (Streamable HTTP)",
-              jokeSources: JOKE_SOURCES.length,
-              storedJokes: allJokes.length,
-              tools: toolCount,
-            }, null, 2),
-          }],
-        };
-      } else if (name === "get_all_jokes") {
-        if (allJokes.length === 0) {
-          toolResponse = {
-            content: [{ type: "text", text: "No jokes saved yet. Get some with get_random_joke!" }],
-          };
-        } else {
-          let msg = `📝 ${allJokes.length} Saved Jokes:\n\n`;
-          allJokes.forEach((joke, i) => {
-            msg += `${i + 1}. ${joke}\n\n`;
-          });
-          toolResponse = { content: [{ type: "text", text: msg.trim() }] };
-        }
-      } else if (name === "clear_jokes") {
-        const count = allJokes.length;
-        allJokes = [];
-        await saveJokes();
-        toolResponse = {
-          content: [{ type: "text", text: `Cleared ${count} jokes from www/jokes.json` }],
-        };
-      } else if (name === "clean_jokes") {
-        const before = allJokes.length;
-        cleanJokes();
-        await saveJokes();
-        const removed = before - allJokes.length;
-        toolResponse = {
-          content: [{ type: "text", text: `🧹 Removed ${removed} null/empty entries (pool: ${allJokes.length})` }],
-        };
-      } else if (name === "get_joke_category") {
-        const category = args.category;
-        let url;
-        if (category === "Programming") {
-          url = "https://v2.jokeapi.dev/joke/Programming?type=single";
-        } else if (category === "Knock-knock") {
-          url = "https://v2.jokeapi.dev/joke/Knock-Knock?type=single";
-        } else if (category === "General") {
-          url = "https://v2.jokeapi.dev/joke/General?type=single";
-        } else if (category === "Chuck Norris") {
-          url = "https://api.chucknorris.io/jokes/random";
-        }
-        try {
-          const resp = await fetch(url, { timeout: 5000 });
-          if (!resp.ok) throw new Error(`API returned ${resp.status}`);
-          const data = await resp.json();
-          const joke = category === "Chuck Norris" ? data.value : data.joke;
-          if (!allJokes.includes(joke)) {
-            allJokes.unshift(joke);
-            await saveJokes();
-          }
-          toolResponse = {
-            content: [{ type: "text", text: `😄 ${category} Joke:\n\n${joke}` }],
-          };
-        } catch (err) {
-          toolResponse = {
-            content: [
-              { type: "text", text: `Error fetching ${category} joke: ${err.message}` },
-            ],
-            isError: true,
-          };
-        }
-      } else if (name === "add_jokes") {
-        const target = Math.min(args.count || 5, 20);
-        let added = 0;
-        for (let i = 0; i < target; i++) {
+      const handlers = {
+        get_random_joke: async () => {
           try {
             const joke = await fetchRandomJoke();
             if (!allJokes.includes(joke)) {
               allJokes.unshift(joke);
-              added++;
+              await saveJokes();
             }
+            return { content: [{ type: "text", text: `😄 ${joke}` }] };
           } catch (err) {
-            console.error(`Error fetching joke ${i + 1}:`, err);
+            return { content: [{ type: "text", text: `Failed to fetch joke: ${err.message}` }], isError: true };
           }
-        }
-        await saveJokes();
-        let msg = `➕ Added ${added} new joke(s) to pool (total: ${allJokes.length}):\n\n`;
-        const newJokes = allJokes.slice(0, added);
-        newJokes.forEach((joke, i) => {
-          msg += `${i + 1}. ${joke}\n\n`;
-        });
-        toolResponse = { content: [{ type: "text", text: msg.trim() }] };
-      } else if (name === "add_joke") {
-        const text = args.text;
-        if (!text || !text.trim()) {
-          toolResponse = { content: [{ type: "text", text: "Joke text is required" }], isError: true };
-        } else if (allJokes.includes(text.trim())) {
-          toolResponse = { content: [{ type: "text", text: "That joke already exists in the pool!" }] };
-        } else {
-          allJokes.unshift(text.trim());
-          await saveJokes();
-          toolResponse = { content: [{ type: "text", text: `➕ Added joke (pool: ${allJokes.length})` }] };
-        }
-      } else if (name === "fill_jokes_batch") {
-        const target = Math.min(args.count || 5, 20);
-        const needed = target - allJokes.length;
-        if (needed > 0) {
-          console.log(`→ Fetching ${needed} joke(s) to reach batch size ${target}`);
-          for (let i = 0; i < needed; i++) {
+        },
+
+        get_multiple_jokes: async () => {
+          const count = Math.min(args.count || 5, 20);
+          const jokes = [];
+          for (let i = 0; i < count; i++) {
             try {
               const joke = await fetchRandomJoke();
-              if (!allJokes.includes(joke)) {
-                allJokes.unshift(joke);
-              }
+              jokes.push(joke);
+              if (!allJokes.includes(joke)) allJokes.unshift(joke);
             } catch (err) {
               console.error(`Error fetching joke ${i + 1}:`, err);
             }
           }
           await saveJokes();
-        }
-        const batch = allJokes.slice(0, target);
-        let msg = `📦 ${batch.length} Dad Jokes (pool: ${allJokes.length}):\n\n`;
-        batch.forEach((joke, i) => {
-          msg += `${i + 1}. ${joke}\n\n`;
-        });
-        toolResponse = { content: [{ type: "text", text: msg.trim() }] };
+          let msg = `😄 ${jokes.length} Dad Jokes:\n\n`;
+          jokes.forEach((joke, i) => { msg += `${i + 1}. ${joke}\n\n`; });
+          return { content: [{ type: "text", text: msg.trim() }] };
+        },
+
+        server_status: async () => ({
+          content: [{ type: "text", text: JSON.stringify({
+            server: "dad-jokes-mcp", version: "1.0.0",
+            protocol: "MCP 2024-11-05 (Streamable HTTP)",
+            jokeSources: JOKE_SOURCES.length, storedJokes: allJokes.length, tools: 10,
+          }, null, 2) }],
+        }),
+
+        get_all_jokes: async () => {
+          if (allJokes.length === 0) {
+            return { content: [{ type: "text", text: "No jokes saved yet. Get some with get_random_joke!" }] };
+          }
+          let msg = `📝 ${allJokes.length} Saved Jokes:\n\n`;
+          allJokes.forEach((joke, i) => { msg += `${i + 1}. ${joke}\n\n`; });
+          return { content: [{ type: "text", text: msg.trim() }] };
+        },
+
+        clear_jokes: async () => {
+          const count = allJokes.length;
+          allJokes = [];
+          await saveJokes();
+          return { content: [{ type: "text", text: `Cleared ${count} jokes from www/jokes.json` }] };
+        },
+
+        clean_jokes: async () => {
+          const before = allJokes.length;
+          cleanJokes();
+          await saveJokes();
+          return { content: [{ type: "text", text: `🧹 Removed ${before - allJokes.length} null/empty entries (pool: ${allJokes.length})` }] };
+        },
+
+        get_joke_category: async () => {
+          const category = args.category;
+          const urls = {
+            "Programming": "https://v2.jokeapi.dev/joke/Programming?type=single",
+            "Knock-knock": "https://v2.jokeapi.dev/joke/Knock-Knock?type=single",
+            "General": "https://v2.jokeapi.dev/joke/General?type=single",
+            "Chuck Norris": "https://api.chucknorris.io/jokes/random",
+          };
+          const url = urls[category];
+          try {
+            const resp = await fetch(url, { timeout: 5000 });
+            if (!resp.ok) throw new Error(`API returned ${resp.status}`);
+            const data = await resp.json();
+            const joke = category === "Chuck Norris" ? data.value : data.joke;
+            if (!allJokes.includes(joke)) { allJokes.unshift(joke); await saveJokes(); }
+            return { content: [{ type: "text", text: `😄 ${category} Joke:\n\n${joke}` }] };
+          } catch (err) {
+            return { content: [{ type: "text", text: `Error fetching ${category} joke: ${err.message}` }], isError: true };
+          }
+        },
+
+        add_jokes: async () => {
+          const target = Math.min(args.count || 5, 20);
+          let added = 0;
+          for (let i = 0; i < target; i++) {
+            try {
+              const joke = await fetchRandomJoke();
+              if (!allJokes.includes(joke)) { allJokes.unshift(joke); added++; }
+            } catch (err) { console.error(`Error fetching joke ${i + 1}:`, err); }
+          }
+          await saveJokes();
+          let msg = `➕ Added ${added} new joke(s) to pool (total: ${allJokes.length}):\n\n`;
+          allJokes.slice(0, added).forEach((joke, i) => { msg += `${i + 1}. ${joke}\n\n`; });
+          return { content: [{ type: "text", text: msg.trim() }] };
+        },
+
+        add_joke: async () => {
+          const text = args.text;
+          if (!text || !text.trim()) {
+            return { content: [{ type: "text", text: "Joke text is required" }], isError: true };
+          }
+          if (allJokes.includes(text.trim())) {
+            return { content: [{ type: "text", text: "That joke already exists in the pool!" }] };
+          }
+          allJokes.unshift(text.trim());
+          await saveJokes();
+          return { content: [{ type: "text", text: `➕ Added joke (pool: ${allJokes.length})` }] };
+        },
+
+        fill_jokes_batch: async () => {
+          const target = Math.min(args.count || 5, 20);
+          const needed = target - allJokes.length;
+          if (needed > 0) {
+            console.log(`→ Fetching ${needed} joke(s) to reach batch size ${target}`);
+            for (let i = 0; i < needed; i++) {
+              try {
+                const joke = await fetchRandomJoke();
+                if (!allJokes.includes(joke)) allJokes.unshift(joke);
+              } catch (err) { console.error(`Error fetching joke ${i + 1}:`, err); }
+            }
+            await saveJokes();
+          }
+          const batch = allJokes.slice(0, target);
+          let msg = `📦 ${batch.length} Dad Jokes (pool: ${allJokes.length}):\n\n`;
+          batch.forEach((joke, i) => { msg += `${i + 1}. ${joke}\n\n`; });
+          return { content: [{ type: "text", text: msg.trim() }] };
+        },
+      };
+
+      const handler = handlers[name];
+      let toolResponse;
+      if (handler) {
+        toolResponse = await handler(args);
       } else {
-        toolResponse = {
-          error: { code: -32601, message: `Tool not found: ${name}` },
-        };
+        toolResponse = { error: { code: -32601, message: `Tool not found: ${name}` } };
       }
 
       response = {

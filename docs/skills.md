@@ -6,7 +6,7 @@ Learned patterns and reusable approaches for this project. Add entries as you di
 
 Two edits in `dad_jokes_mcp.mjs`:
 1. Add entry to `tools` array in `tools/list`
-2. Add `else if (name === "...")` branch in `tools/call`
+2. Add a new key to the `handlers` object in `tools/call`: `your_tool: async () => { ... }`
 
 ## Existing tools
 

@@ -59,7 +59,7 @@ test "add_jokes" \
   'Added'
 
 test "add_joke" \
-  '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add_joke","arguments":{"text":"Test joke from CI"}}}' \
+  '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add_joke","arguments":{"text":"Test joke from CI '"$(date +%s)"'"}}}' \
   'Added'
 
 test "clean_jokes" \

@@ -23,7 +23,7 @@ Single-file app: `dad_jokes_mcp.mjs` (~400 lines, Express 5 + native `fetch`).
 Must edit **two places** in `dad_jokes_mcp.mjs`:
 
 1. **`tools/list`** — add entry to the `tools` array with `name`, `description`, `inputSchema`
-2. **`tools/call`** — add `else if (name === "your_tool")` branch in the if/else chain
+2. **`tools/call`** — add a new key to the `handlers` object: `your_tool: async () => { ... }`
 
 No restart needed with `npm run dev` (file watch).
 
