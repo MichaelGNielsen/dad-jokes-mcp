@@ -126,7 +126,8 @@ async function loadJokes() {
     if (text.startsWith("No jokes")) {
       allJokes = [];
     } else {
-      allJokes = text.split("\n\n").slice(1).map(line => line.replace(/^\d+\.\s*/, "")).filter(Boolean);
+      const parts = text.split(/\n(?=\d+\. )/).slice(1);
+      allJokes = parts.map(p => p.replace(/^\d+\.\s*/, "").trim()).filter(Boolean);
     }
     render();
   } catch (e) {
