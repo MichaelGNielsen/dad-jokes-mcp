@@ -1,4 +1,176 @@
-# Dad Jokes MCP Server
+## Available Tools
+
+| Tool Name | Description | Input | Output | Example |
+|-----------|-------------|-------|--------|----------|
+| `get_random_joke` | Dad jokes duh - Fetch a random dad joke and save it | None | Joke text | `@dad-jokes-mcp get_random_joke` |
+| `get_multiple_jokes` | Fetch multiple random dad jokes at once | `count` (1-20, default: 5) | Array of jokes | `@dad-jokes-mcp get_multiple_jokes count=10` |
+| `get_all_jokes` | View all jokes stored in www/jokes.json | None | All saved jokes | `@dad-jokes-mcp get_all_jokes` |
+| `clear_jokes` | Delete all saved jokes | None | Confirmation message | `@dad-jokes-mcp clear_jokes` |
+| `get_joke_category` | Get joke from category | `category` (Programming, Knock-knock, General, Chuck Norris) | Joke from category | `@dad-jokes-mcp get_joke_category category=Programming` |
+
+## How MCP Tool Routing Works
+
+### The Short Answer
+
+Nej, det er **ikke hardkodet**. Det er **dynamisk routing** baseret på tool-navn.
+
+### Hvad der sker når du skriver:
+
+```
+@dad-jokes-mcp get_multiple_jokes count=10
+```
+
+**Step 1: PA parser din besked**
+- PA ser `@dad-jokes-mcp` = server navn
+- PA ser `get_multiple_jokes` = tool navn
+- PA ser `count=10` = argument
+
+**Step 2: PA laver en JSON-RPC request**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 123,
+  "method": "tools/call",
+  "params": {
+    "name": "get_multiple_jokes",
+    "arguments": {
+      "count": 10
+    }
+  }
+}
+```
+
+**Step 3: MCP Server modtager request**
+
+Serveren (dad_jokes_mcp.mjs) modtager JSON via POST `/mcp`:
+
+```javascript
+if (request.method === "tools/call") {
+  const { name, arguments: args } = request.params;
+  
+  // name = "get_multiple_jokes"
+  // args = { count: 10 }
+  
+  if (name === "get_multiple_jokes") {
+    const count = Math.min(args.count || 5, 20);
+    // ... fetch 10 jokes ...
+  }
+}
+```
+
+**Step 4: Server matcher tool-navn og udfører**
+
+Serveren bruger en `if/else` chain til at matche tool-navn:
+
+```javascript
+if (name === "get_random_joke") {
+  // Execute get_random_joke
+} else if (name === "get_multiple_jokes") {
+  // Execute get_multiple_jokes ← MATCH!
+} else if (name === "get_all_jokes") {
+  // Execute get_all_jokes
+} else if (name === "clear_jokes") {
+  // Execute clear_jokes
+} else if (name === "get_joke_category") {
+  // Execute get_joke_category
+}
+```
+
+**Step 5: Server returnerer resultat**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 123,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "😄 10 Dad Jokes:\n\n1. ...\n2. ..."
+      }
+    ]
+  }
+}
+```
+
+**Step 6: PA viser resultatet**
+
+PA modtager resultatet og viser det for brugeren.
+
+### Hvorfor er det ikke hardkodet?
+
+1. **Tool-navne er defineret dynamisk** - I `tools/list` metoden returnerer serveren hvilke tools der findes
+2. **Arguments er dynamiske** - Hver tool kan have forskellige inputs
+3. **Routing er baseret på string matching** - `if (name === "tool_name")` matcher kun hvis navn passer
+
+### Hvis du tilføjede en ny tool
+
+Du skulle:
+
+1. Tilføje den til `tools/list` response:
+```javascript
+{
+  name: "my_new_tool",
+  description: "What it does",
+  inputSchema: { /* ... */ }
+}
+```
+
+2. Tilføje handling i `tools/call`:
+```javascript
+else if (name === "my_new_tool") {
+  // Do something
+  toolResponse = { content: [{ type: "text", text: "Result" }] };
+}
+```
+
+3. PA ville automatisk detektere den næste gang den kalder `tools/list`!
+
+### MCP Protocol Flow
+
+```
+PA Client                          MCP Server (dad_jokes_mcp.js)
+   │                                        │
+   ├─ POST /mcp (initialize) ──────────────┤
+   │                                        │
+   │ ◄──── { serverInfo, capabilities } ──┤
+   │                                        │
+   ├─ POST /mcp (tools/list) ─────────────┤
+   │                                        │
+   │ ◄──── { tools: [...] } ────────────────┤
+   │                                        │
+   ├─ POST /mcp (tools/call) ─────────────┤
+   │   { name: "get_multiple_jokes", ... }│
+   │                                        │
+   │ ◄──── { result: { content: [...] } } ─┤
+   │                                        │
+```
+
+## API Details
+
+### MCP Endpoint: `/mcp`
+
+**Method:** `POST`
+
+**Headers:**
+- `Content-Type: application/json`
+- `Mcp-Session-Id` (response header - auto-generated)
+
+**Request Format:** JSON-RPC 2.0
+
+Example request body for calling a tool:
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "get_random_joke",
+    "arguments": {}
+  }
+}
+```# Dad Jokes MCP Server
 
 A Model Context Protocol (MCP) server that fetches and manages dad jokes via Streamable HTTP transport. Jokes are automatically saved to persistent storage.
 
@@ -127,12 +299,7 @@ Example request body for calling a tool:
 
 - `./www:/app/www` - Mounts local `www/` directory for persistent joke storage
 
-## Supported Joke Categories
 
-- **Programming** - Tech & programming jokes
-- **Knock-knock** - Classic knock-knock jokes
-- **General** - General humor
-- **Chuck Norris** - Chuck Norris jokes
 
 ## Development
 
