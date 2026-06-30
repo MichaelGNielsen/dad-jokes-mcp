@@ -58,6 +58,14 @@ test "add_jokes" \
   '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add_jokes","arguments":{"count":3}}}' \
   'Added'
 
+test "add_joke" \
+  '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add_joke","arguments":{"text":"Test joke from CI"}}}' \
+  'Added'
+
+test "clean_jokes" \
+  '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"clean_jokes","arguments":{}}}' \
+  'Removed'
+
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="
 exit $FAIL

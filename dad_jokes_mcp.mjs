@@ -27,12 +27,22 @@ const JOKE_SOURCES = [
   "https://api.jokes.one/jod",
 ];
 
+// Remove null/empty entries
+function cleanJokes() {
+  const before = allJokes.length;
+  allJokes = allJokes.filter(j => j && typeof j === "string" && j.trim());
+  if (allJokes.length < before) {
+    console.log(`🧹 Cleaned ${before - allJokes.length} null/empty entries`);
+  }
+}
+
 // Initialize
 async function init() {
   await fs.mkdir(WWW_DIR, { recursive: true });
   try {
     const data = await fs.readFile(JOKES_FILE, "utf-8");
     allJokes = JSON.parse(data);
+    cleanJokes();
     console.log(`✓ Loaded ${allJokes.length} jokes from file`);
   } catch (err) {
     console.log("✓ Starting fresh with no jokes");
@@ -42,6 +52,7 @@ async function init() {
 
 // Save jokes to file
 async function saveJokes() {
+  cleanJokes();
   try {
     await fs.writeFile(JOKES_FILE, JSON.stringify(allJokes, null, 2));
   } catch (err) {
@@ -181,6 +192,14 @@ app.post("/mcp", async (req, res) => {
               },
             },
             {
+              name: "clean_jokes",
+              description: "Remove null/empty entries from the joke pool.",
+              inputSchema: {
+                type: "object",
+                properties: {},
+              },
+            },
+            {
               name: "get_joke_category",
               description: "Fetch a joke from a specific category.",
               inputSchema: {
@@ -228,6 +247,21 @@ app.post("/mcp", async (req, res) => {
                 },
               },
             },
+            {
+              name: "add_joke",
+              description:
+                "Add a custom joke to the pool manually.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  text: {
+                    type: "string",
+                    description: "The joke text to add",
+                  },
+                },
+                required: ["text"],
+              },
+            },
           ],
         },
       };
@@ -270,7 +304,7 @@ app.post("/mcp", async (req, res) => {
         });
         toolResponse = { content: [{ type: "text", text: msg.trim() }] };
       } else if (name === "server_status") {
-        const toolCount = 8;
+        const toolCount = 10;
         toolResponse = {
           content: [{
             type: "text",
@@ -302,6 +336,14 @@ app.post("/mcp", async (req, res) => {
         await saveJokes();
         toolResponse = {
           content: [{ type: "text", text: `Cleared ${count} jokes from www/jokes.json` }],
+        };
+      } else if (name === "clean_jokes") {
+        const before = allJokes.length;
+        cleanJokes();
+        await saveJokes();
+        const removed = before - allJokes.length;
+        toolResponse = {
+          content: [{ type: "text", text: `🧹 Removed ${removed} null/empty entries (pool: ${allJokes.length})` }],
         };
       } else if (name === "get_joke_category") {
         const category = args.category;
@@ -356,6 +398,17 @@ app.post("/mcp", async (req, res) => {
           msg += `${i + 1}. ${joke}\n\n`;
         });
         toolResponse = { content: [{ type: "text", text: msg.trim() }] };
+      } else if (name === "add_joke") {
+        const text = args.text;
+        if (!text || !text.trim()) {
+          toolResponse = { content: [{ type: "text", text: "Joke text is required" }], isError: true };
+        } else if (allJokes.includes(text.trim())) {
+          toolResponse = { content: [{ type: "text", text: "That joke already exists in the pool!" }] };
+        } else {
+          allJokes.unshift(text.trim());
+          await saveJokes();
+          toolResponse = { content: [{ type: "text", text: `➕ Added joke (pool: ${allJokes.length})` }] };
+        }
       } else if (name === "fill_jokes_batch") {
         const target = Math.min(args.count || 5, 20);
         const needed = target - allJokes.length;

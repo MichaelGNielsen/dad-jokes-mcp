@@ -35,11 +35,20 @@
     border: 1px solid #30363d; border-radius: 6px;
     background: #0d1117; color: #c9d1d9; font-size: 0.875rem;
   }
+  .add-row {
+    display: flex; gap: 0.5rem; margin-bottom: 1rem;
+  }
+  .add-row textarea {
+    flex: 1; resize: vertical; min-height: 2.5rem; max-height: 6rem;
+    padding: 0.5rem 0.75rem; border: 1px solid #30363d; border-radius: 6px;
+    background: #0d1117; color: #c9d1d9; font-size: 0.875rem; font-family: inherit;
+  }
 
   .joke-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
   .joke-list li {
     background: #161b22; border: 1px solid #30363d; border-radius: 8px;
     padding: 0.75rem 1rem; font-size: 0.9375rem; line-height: 1.5;
+    white-space: pre-wrap;
   }
   .joke-list li .tag {
     display: inline-block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
@@ -80,7 +89,13 @@
     <button class="primary" id="btn-random">🎲 Random</button>
     <button class="primary" id="btn-batch">➕ Add 5</button>
     <button id="btn-clear">🗑 Clear</button>
+    <button id="btn-clean">🧹 Clean</button>
     <button id="btn-refresh">🔄</button>
+  </div>
+
+  <div class="add-row">
+    <textarea id="joke-input" placeholder="Write your own joke..." rows="1"></textarea>
+    <button class="primary" id="btn-add-joke">➕ Add</button>
   </div>
 
   <ul class="joke-list" id="joke-list"></ul>
@@ -154,7 +169,7 @@ function render() {
   empty.style.display = "none";
   list.innerHTML = filtered.map(j => {
     const tag = classify(j);
-    const body = escapeHtml(j).replace(/\n/g, "<br>\n");
+    const body = escapeHtml(j);
     return `<li><span class="tag tag-${tag}">${tag}</span>${body}</li>`;
   }).join("");
 }
@@ -198,6 +213,30 @@ async function clearJokes() {
   }
 }
 
+async function cleanJokes() {
+  try {
+    const result = await mcp("tools/call", { name: "clean_jokes", arguments: {} });
+    toast(result.content[0].text);
+    await loadJokes();
+  } catch (e) {
+    toast("Error: " + e.message, true);
+  }
+}
+
+async function addCustomJoke() {
+  const input = document.getElementById("joke-input");
+  const text = input.value.trim();
+  if (!text) return;
+  try {
+    const result = await mcp("tools/call", { name: "add_joke", arguments: { text } });
+    toast(result.content[0].text);
+    input.value = "";
+    await loadJokes();
+  } catch (e) {
+    toast("Error: " + e.message, true);
+  }
+}
+
 function toast(msg, isError = false) {
   const el = document.getElementById("toast");
   el.textContent = msg;
@@ -216,7 +255,12 @@ document.getElementById("category").addEventListener("change", e => {
 document.getElementById("btn-random").addEventListener("click", fetchRandom);
 document.getElementById("btn-batch").addEventListener("click", () => batchAdd(5));
 document.getElementById("btn-clear").addEventListener("click", clearJokes);
+document.getElementById("btn-clean").addEventListener("click", cleanJokes);
 document.getElementById("btn-refresh").addEventListener("click", loadJokes);
+document.getElementById("btn-add-joke").addEventListener("click", addCustomJoke);
+document.getElementById("joke-input").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addCustomJoke(); }
+});
 
 loadJokes();
 </script>
