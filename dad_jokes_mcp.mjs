@@ -1,26 +1,18 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
 import express from "express";
+import fs from "fs/promises";
+import path from "path";
 
 /**
  * Dad Jokes MCP Server (Streamable HTTP version)
- * Uses the new MCP Streamable HTTP transport
+ * Saves jokes to www/jokes.json
  */
 
-const server = new Server(
-  {
-    name: "dad-jokes-mcp",
-    version: "1.0.0",
-  },
-  {
-    capabilities: {
-      tools: {},
-    },
-  }
-);
+// Paths
+const WWW_DIR = "/app/www";
+const JOKES_FILE = path.join(WWW_DIR, "jokes.json");
+
+// In-memory storage for jokes
+let allJokes = [];
 
 // List of joke APIs
 const JOKE_SOURCES = [
@@ -35,10 +27,29 @@ const JOKE_SOURCES = [
   "https://api.jokes.one/jod",
 ];
 
-// In-memory storage for favorites
-let favoriteJokes = [];
+// Initialize
+async function init() {
+  await fs.mkdir(WWW_DIR, { recursive: true });
+  try {
+    const data = await fs.readFile(JOKES_FILE, "utf-8");
+    allJokes = JSON.parse(data);
+    console.log(`✓ Loaded ${allJokes.length} jokes from file`);
+  } catch (err) {
+    console.log("✓ Starting fresh with no jokes");
+    allJokes = [];
+  }
+}
 
-// Helper function to fetch a random joke
+// Save jokes to file
+async function saveJokes() {
+  try {
+    await fs.writeFile(JOKES_FILE, JSON.stringify(allJokes, null, 2));
+  } catch (err) {
+    console.error("✗ Error saving jokes:", err);
+  }
+}
+
+// Fetch a random joke
 async function fetchRandomJoke() {
   const maxRetries = 3;
   let retryCount = 0;
@@ -50,7 +61,6 @@ async function fetchRandomJoke() {
     try {
       const response = await fetch(randomSource, { timeout: 5000 });
       if (!response.ok) throw new Error(`API returned ${response.status}`);
-      
       const data = await response.json();
 
       if (randomSource.includes("official-joke-api")) {
@@ -73,232 +83,19 @@ async function fetchRandomJoke() {
         throw new Error("Unknown API format");
       }
     } catch (error) {
-      console.error(`Error fetching from ${randomSource}:`, error.message);
+      console.error(`✗ Error fetching from ${randomSource}:`, error.message);
       retryCount++;
       if (retryCount < maxRetries) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
   }
-
   throw new Error("Failed to fetch joke after retries");
 }
 
-server.setRequestHandler(ListToolsRequestSchema, async () => {
-  return {
-    tools: [
-      {
-        name: "get_random_joke",
-        description: "Fetch a random dad joke from multiple joke sources.",
-        inputSchema: {
-          type: "object",
-          properties: {},
-        },
-      },
-      {
-        name: "get_multiple_jokes",
-        description: "Fetch multiple random dad jokes at once.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            count: {
-              type: "number",
-              description: "Number of jokes to fetch (default: 5, max: 20)",
-            },
-          },
-        },
-      },
-      {
-        name: "add_favorite_joke",
-        description: "Add a joke to your favorites list.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            joke: {
-              type: "string",
-              description: "The joke text to add to favorites",
-            },
-          },
-          required: ["joke"],
-        },
-      },
-      {
-        name: "get_favorite_jokes",
-        description: "Get all your favorite jokes.",
-        inputSchema: {
-          type: "object",
-          properties: {},
-        },
-      },
-      {
-        name: "remove_favorite_joke",
-        description: "Remove a joke from your favorites list.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            index: {
-              type: "number",
-              description: "Index of the joke to remove (0-based)",
-            },
-          },
-          required: ["index"],
-        },
-      },
-      {
-        name: "clear_favorites",
-        description: "Clear all favorite jokes.",
-        inputSchema: {
-          type: "object",
-          properties: {},
-        },
-      },
-      {
-        name: "get_joke_category",
-        description: "Fetch a joke from a specific category.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            category: {
-              type: "string",
-              enum: ["Programming", "Knock-knock", "General", "Chuck Norris"],
-              description: "Joke category",
-            },
-          },
-          required: ["category"],
-        },
-      },
-    ],
-  };
-});
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
-
-  try {
-    if (name === "get_random_joke") {
-      const joke = await fetchRandomJoke();
-      return {
-        content: [{ type: "text", text: `😄 ${joke}` }],
-      };
-    }
-
-    if (name === "get_multiple_jokes") {
-      const count = Math.min(args.count || 5, 20);
-      const jokes = [];
-      for (let i = 0; i < count; i++) {
-        try {
-          const joke = await fetchRandomJoke();
-          jokes.push(joke);
-        } catch (err) {
-          console.error(`Error fetching joke ${i + 1}:`, err);
-        }
-      }
-      let msg = `😄 ${jokes.length} Dad Jokes:\n\n`;
-      jokes.forEach((joke, i) => {
-        msg += `${i + 1}. ${joke}\n\n`;
-      });
-      return {
-        content: [{ type: "text", text: msg.trim() }],
-      };
-    }
-
-    if (name === "add_favorite_joke") {
-      const joke = args.joke;
-      if (favoriteJokes.includes(joke)) {
-        return {
-          content: [{ type: "text", text: "⭐ This joke is already in your favorites!" }],
-        };
-      }
-      favoriteJokes.push(joke);
-      return {
-        content: [
-          {
-            type: "text",
-            text: `⭐ Added to favorites! You now have ${favoriteJokes.length} favorite jokes.`,
-          },
-        ],
-      };
-    }
-
-    if (name === "get_favorite_jokes") {
-      if (favoriteJokes.length === 0) {
-        return {
-          content: [{ type: "text", text: "No favorite jokes yet. Add some with add_favorite_joke!" }],
-        };
-      }
-      let msg = `⭐ Your ${favoriteJokes.length} Favorite Jokes:\n\n`;
-      favoriteJokes.forEach((joke, i) => {
-        msg += `${i + 1}. ${joke}\n\n`;
-      });
-      return {
-        content: [{ type: "text", text: msg.trim() }],
-      };
-    }
-
-    if (name === "remove_favorite_joke") {
-      const index = args.index;
-      if (index < 0 || index >= favoriteJokes.length) {
-        return {
-          content: [{ type: "text", text: `Invalid index. You have ${favoriteJokes.length} favorites.` }],
-          isError: true,
-        };
-      }
-      const removed = favoriteJokes.splice(index, 1)[0];
-      return {
-        content: [{ type: "text", text: `Removed: "${removed}"\nRemaining favorites: ${favoriteJokes.length}` }],
-      };
-    }
-
-    if (name === "clear_favorites") {
-      const count = favoriteJokes.length;
-      favoriteJokes = [];
-      return {
-        content: [{ type: "text", text: `Cleared ${count} favorite jokes.` }],
-      };
-    }
-
-    if (name === "get_joke_category") {
-      const category = args.category;
-      let url;
-
-      if (category === "Programming") {
-        url = "https://v2.jokeapi.dev/joke/Programming?type=single";
-      } else if (category === "Knock-knock") {
-        url = "https://v2.jokeapi.dev/joke/Knock-Knock?type=single";
-      } else if (category === "General") {
-        url = "https://v2.jokeapi.dev/joke/General?type=single";
-      } else if (category === "Chuck Norris") {
-        url = "https://api.chucknorris.io/jokes/random";
-      }
-
-      try {
-        const response = await fetch(url, { timeout: 5000 });
-        if (!response.ok) throw new Error(`API returned ${response.status}`);
-        const data = await response.json();
-        let joke = category === "Chuck Norris" ? data.value : data.joke;
-        return {
-          content: [{ type: "text", text: `😄 ${category} Joke:\n\n${joke}` }],
-        };
-      } catch (err) {
-        return {
-          content: [{ type: "text", text: `Error fetching ${category} joke: ${err.message}` }],
-          isError: true,
-        };
-      }
-    }
-
-    throw new Error(`Tool not found: ${name}`);
-  } catch (error) {
-    return {
-      content: [{ type: "text", text: `Error: ${error.message}` }],
-      isError: true,
-    };
-  }
-});
-
-// HTTP Server for Streamable HTTP transport
+// HTTP Server
 const app = express();
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }));
 
 app.get("/", (req, res) => {
   res.send("Dad Jokes MCP Streamable HTTP Server 😄");
@@ -308,7 +105,7 @@ app.get("/", (req, res) => {
 app.post("/mcp", async (req, res) => {
   try {
     const request = req.body;
-    
+
     if (!request || !request.method) {
       return res.status(400).json({
         jsonrpc: "2.0",
@@ -316,9 +113,9 @@ app.post("/mcp", async (req, res) => {
       });
     }
 
-    // Generate session ID
-    const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
+    const sessionId = `session-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     let response;
 
     if (request.method === "initialize") {
@@ -335,24 +132,164 @@ app.post("/mcp", async (req, res) => {
         },
       };
     } else if (request.method === "tools/list") {
-      const toolsResult = await server.requestHandler(
-        { ...request, params: request.params || {} },
-        ListToolsRequestSchema
-      );
       response = {
         jsonrpc: "2.0",
         id: request.id,
-        result: toolsResult,
+        result: {
+          tools: [
+            {
+              name: "get_random_joke",
+              description:
+                "Fetch a random dad joke and save it to www/jokes.json",
+              inputSchema: {
+                type: "object",
+                properties: {},
+              },
+            },
+            {
+              name: "get_multiple_jokes",
+              description: "Fetch multiple random dad jokes at once.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  count: {
+                    type: "number",
+                    description: "Number of jokes to fetch (default: 5, max: 20)",
+                  },
+                },
+              },
+            },
+            {
+              name: "get_all_jokes",
+              description: "Get all jokes stored in www/jokes.json",
+              inputSchema: {
+                type: "object",
+                properties: {},
+              },
+            },
+            {
+              name: "clear_jokes",
+              description: "Clear all saved jokes.",
+              inputSchema: {
+                type: "object",
+                properties: {},
+              },
+            },
+            {
+              name: "get_joke_category",
+              description: "Fetch a joke from a specific category.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  category: {
+                    type: "string",
+                    enum: [
+                      "Programming",
+                      "Knock-knock",
+                      "General",
+                      "Chuck Norris",
+                    ],
+                    description: "Joke category",
+                  },
+                },
+                required: ["category"],
+              },
+            },
+          ],
+        },
       };
     } else if (request.method === "tools/call") {
-      const callResult = await server.requestHandler(
-        { ...request, params: request.params },
-        CallToolRequestSchema
-      );
+      const { name, arguments: args } = request.params;
+      let toolResponse;
+
+      if (name === "get_random_joke") {
+        const joke = await fetchRandomJoke();
+        if (!allJokes.includes(joke)) {
+          allJokes.unshift(joke);
+          await saveJokes();
+        }
+        toolResponse = { content: [{ type: "text", text: `😄 ${joke}` }] };
+      } else if (name === "get_multiple_jokes") {
+        const count = Math.min(args.count || 5, 20);
+        const jokes = [];
+        for (let i = 0; i < count; i++) {
+          try {
+            const joke = await fetchRandomJoke();
+            jokes.push(joke);
+            if (!allJokes.includes(joke)) {
+              allJokes.unshift(joke);
+            }
+          } catch (err) {
+            console.error(`Error fetching joke ${i + 1}:`, err);
+          }
+        }
+        await saveJokes();
+        let msg = `😄 ${jokes.length} Dad Jokes:\n\n`;
+        jokes.forEach((joke, i) => {
+          msg += `${i + 1}. ${joke}\n\n`;
+        });
+        toolResponse = { content: [{ type: "text", text: msg.trim() }] };
+      } else if (name === "get_all_jokes") {
+        if (allJokes.length === 0) {
+          toolResponse = {
+            content: [{ type: "text", text: "No jokes saved yet. Get some with get_random_joke!" }],
+          };
+        } else {
+          let msg = `📝 ${allJokes.length} Saved Jokes:\n\n`;
+          allJokes.forEach((joke, i) => {
+            msg += `${i + 1}. ${joke}\n\n`;
+          });
+          toolResponse = { content: [{ type: "text", text: msg.trim() }] };
+        }
+      } else if (name === "clear_jokes") {
+        const count = allJokes.length;
+        allJokes = [];
+        await saveJokes();
+        toolResponse = {
+          content: [{ type: "text", text: `Cleared ${count} jokes from www/jokes.json` }],
+        };
+      } else if (name === "get_joke_category") {
+        const category = args.category;
+        let url;
+        if (category === "Programming") {
+          url = "https://v2.jokeapi.dev/joke/Programming?type=single";
+        } else if (category === "Knock-knock") {
+          url = "https://v2.jokeapi.dev/joke/Knock-Knock?type=single";
+        } else if (category === "General") {
+          url = "https://v2.jokeapi.dev/joke/General?type=single";
+        } else if (category === "Chuck Norris") {
+          url = "https://api.chucknorris.io/jokes/random";
+        }
+        try {
+          const resp = await fetch(url, { timeout: 5000 });
+          if (!resp.ok) throw new Error(`API returned ${resp.status}`);
+          const data = await resp.json();
+          const joke = category === "Chuck Norris" ? data.value : data.joke;
+          if (!allJokes.includes(joke)) {
+            allJokes.unshift(joke);
+            await saveJokes();
+          }
+          toolResponse = {
+            content: [{ type: "text", text: `😄 ${category} Joke:\n\n${joke}` }],
+          };
+        } catch (err) {
+          toolResponse = {
+            content: [
+              { type: "text", text: `Error fetching ${category} joke: ${err.message}` },
+            ],
+            isError: true,
+          };
+        }
+      } else {
+        toolResponse = {
+          error: { code: -32601, message: `Tool not found: ${name}` },
+        };
+      }
+
       response = {
         jsonrpc: "2.0",
         id: request.id,
-        result: callResult,
+        result: toolResponse,
       };
     } else {
       response = {
@@ -369,7 +306,7 @@ app.post("/mcp", async (req, res) => {
     res.setHeader("Content-Type", "application/json");
     res.json(response);
   } catch (err) {
-    console.error("Error in /mcp handler:", err);
+    console.error("✗ Error in /mcp handler:", err);
     res.status(500).json({
       jsonrpc: "2.0",
       error: {
@@ -381,15 +318,20 @@ app.post("/mcp", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-const server_instance = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`
+
+// Start server after init
+init().then(() => {
+  const server_instance = app.listen(PORT, "0.0.0.0", () => {
+    console.log(`
 🚀 Dad Jokes MCP Server (Streamable HTTP) running!
 ----------------------------------------------------
 MCP endpoint:  http://0.0.0.0:${PORT}/mcp
+Jokes file:    /app/www/jokes.json
 Port:          ${PORT}
   `);
-});
+  });
 
-server_instance.on("error", (err) => {
-  console.error("💥 SERVER ERROR:", err);
+  server_instance.on("error", (err) => {
+    console.error("💥 SERVER ERROR:", err);
+  });
 });
