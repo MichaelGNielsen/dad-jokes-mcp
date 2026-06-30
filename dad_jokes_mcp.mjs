@@ -140,7 +140,7 @@ app.post("/mcp", async (req, res) => {
             {
               name: "get_random_joke",
               description:
-                "Fetch a random dad joke and save it to www/jokes.json",
+                "Man dad jokes duhh - Fetch a random dad joke and save it to www/jokes.json",
               inputSchema: {
                 type: "object",
                 properties: {},
