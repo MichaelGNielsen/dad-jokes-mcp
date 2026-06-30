@@ -14,6 +14,7 @@ Two edits in `dad_jokes_mcp.mjs`:
 |---|---|
 | `get_random_joke` | Fetch & save one random joke |
 | `get_multiple_jokes` | Fetch N fresh jokes (always fetches) |
+| `server_status` | Show version, sources, stored count, tools count |
 | `get_all_jokes` | List all stored jokes |
 | `clear_jokes` | Delete all stored jokes |
 | `get_joke_category` | Fetch from specific category |

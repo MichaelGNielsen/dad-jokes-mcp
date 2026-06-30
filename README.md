@@ -6,6 +6,7 @@
 |-----------|-------------|-------|--------|----------|
 | `get_random_joke` | Dad jokes duh - Fetch a random dad joke and save it | None | Joke text | `@dad-jokes-mcp get_random_joke` |
 | `get_multiple_jokes` | Fetch multiple random dad jokes at once | `count` (1-20, default: 5) | Array of jokes | `@dad-jokes-mcp get_multiple_jokes count=10` |
+| `server_status` | Show server version, joke sources count, stored jokes, and tools | None | JSON status object | `@dad-jokes-mcp server_status` |
 | `get_all_jokes` | View all jokes stored in www/jokes.json | None | All saved jokes | `@dad-jokes-mcp get_all_jokes` |
 | `clear_jokes` | Delete all saved jokes | None | Confirmation message | `@dad-jokes-mcp clear_jokes` |
 | `get_joke_category` | Get joke from category | `category` (Programming, Knock-knock, General, Chuck Norris) | Joke from category | `@dad-jokes-mcp get_joke_category category=Programming` |
@@ -190,9 +191,10 @@ A Model Context Protocol (MCP) server that fetches and manages dad jokes via Str
 - 💾 **Persistent Storage** - Jokes automatically saved to `www/jokes.json`
 - 😄 **Multiple Joke Sources** - Fetches from 9+ joke APIs
 - 🐳 **Docker Ready** - Full Docker setup with volume mounts
-- 🔧 **7 Tools**:
+- 🔧 **8 Tools**:
   - `get_random_joke` - Fetch a random dad joke and save it
   - `get_multiple_jokes` - Fetch multiple jokes at once
+  - `server_status` - View server status, version, and stats
   - `get_all_jokes` - View all saved jokes
   - `clear_jokes` - Clear saved jokes
   - `get_joke_category` - Get jokes by category (Programming, Knock-knock, General, Chuck Norris)

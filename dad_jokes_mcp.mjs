@@ -160,6 +160,14 @@ app.post("/mcp", async (req, res) => {
               },
             },
             {
+              name: "server_status",
+              description: "Show server version, number of joke sources, stored jokes count, and available tools.",
+              inputSchema: {
+                type: "object",
+                properties: {},
+              },
+            },
+            {
               name: "get_all_jokes",
               description: "Get all jokes stored in www/jokes.json",
               inputSchema: {
@@ -257,6 +265,21 @@ app.post("/mcp", async (req, res) => {
           msg += `${i + 1}. ${joke}\n\n`;
         });
         toolResponse = { content: [{ type: "text", text: msg.trim() }] };
+      } else if (name === "server_status") {
+        const toolCount = 8;
+        toolResponse = {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              server: "dad-jokes-mcp",
+              version: "1.0.0",
+              protocol: "MCP 2024-11-05 (Streamable HTTP)",
+              jokeSources: JOKE_SOURCES.length,
+              storedJokes: allJokes.length,
+              tools: toolCount,
+            }, null, 2),
+          }],
+        };
       } else if (name === "get_all_jokes") {
         if (allJokes.length === 0) {
           toolResponse = {
