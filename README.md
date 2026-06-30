@@ -213,7 +213,7 @@ A Model Context Protocol (MCP) server that fetches and manages dad jokes via Str
 docker compose up -d
 ```
 
-The server will start on `http://localhost:5000/mcp`
+The server will start on `http://localhost:5000/` (frontend) with MCP endpoint at `/mcp`
 
 ### MCP Configuration
 
