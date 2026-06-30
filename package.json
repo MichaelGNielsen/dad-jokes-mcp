@@ -1,0 +1,18 @@
+{
+  "name": "dad-jokes-mcp",
+  "version": "1.0.0",
+  "description": "Dad Jokes MCP Server - Fetch and manage dad jokes via Model Context Protocol",
+  "main": "dad_jokes_mcp.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node dad_jokes_mcp.mjs",
+    "dev": "node --watch dad_jokes_mcp.mjs"
+  },
+  "keywords": ["mcp", "dad-jokes", "api"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "express": "^5.2.1"
+  }
+}
