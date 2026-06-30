@@ -1,3 +1,5 @@
+> **Agent instructions:** See [`AGENTS.md`](AGENTS.md) for architecture, commands, and how to add tools.
+
 ## Available Tools
 
 | Tool Name | Description | Input | Output | Example |
@@ -7,6 +9,8 @@
 | `get_all_jokes` | View all jokes stored in www/jokes.json | None | All saved jokes | `@dad-jokes-mcp get_all_jokes` |
 | `clear_jokes` | Delete all saved jokes | None | Confirmation message | `@dad-jokes-mcp clear_jokes` |
 | `get_joke_category` | Get joke from category | `category` (Programming, Knock-knock, General, Chuck Norris) | Joke from category | `@dad-jokes-mcp get_joke_category category=Programming` |
+| `fill_jokes_batch` | Ensure at least N jokes are stored; fetches new ones if needed | `count` (1-20, default: 5) | N jokes from pool | `@dad-jokes-mcp fill_jokes_batch count=10` |
+| `add_jokes` | Fetch and store N new jokes regardless of current pool size | `count` (1-20, default: 5) | N new jokes added | `@dad-jokes-mcp add_jokes count=10` |
 
 ## How MCP Tool Routing Works
 
@@ -74,6 +78,10 @@ if (name === "get_random_joke") {
   // Execute clear_jokes
 } else if (name === "get_joke_category") {
   // Execute get_joke_category
+} else if (name === "fill_jokes_batch") {
+  // Execute fill_jokes_batch
+} else if (name === "add_jokes") {
+  // Execute add_jokes
 }
 ```
 
@@ -132,18 +140,18 @@ else if (name === "my_new_tool") {
 ```
 PA Client                          MCP Server (dad_jokes_mcp.js)
    │                                        │
-   ├─ POST /mcp (initialize) ──────────────┤
+   ├─ POST /mcp (initialize) ───────────────┤
    │                                        │
-   │ ◄──── { serverInfo, capabilities } ──┤
+   │ ◄──── { serverInfo, capabilities } ────┤
    │                                        │
-   ├─ POST /mcp (tools/list) ─────────────┤
+   ├─ POST /mcp (tools/list) ───────────────┤
    │                                        │
    │ ◄──── { tools: [...] } ────────────────┤
    │                                        │
-   ├─ POST /mcp (tools/call) ─────────────┤
-   │   { name: "get_multiple_jokes", ... }│
+   ├─ POST /mcp (tools/call) ───────────────┤
+   │   { name: "get_multiple_jokes", ... }  │
    │                                        │
-   │ ◄──── { result: { content: [...] } } ─┤
+   │ ◄──── { result: { content: [...] } } ──┤
    │                                        │
 ```
 
@@ -170,7 +178,9 @@ Example request body for calling a tool:
     "arguments": {}
   }
 }
-```# Dad Jokes MCP Server
+```
+
+# Dad Jokes MCP Server
 
 A Model Context Protocol (MCP) server that fetches and manages dad jokes via Streamable HTTP transport. Jokes are automatically saved to persistent storage.
 
@@ -180,12 +190,14 @@ A Model Context Protocol (MCP) server that fetches and manages dad jokes via Str
 - 💾 **Persistent Storage** - Jokes automatically saved to `www/jokes.json`
 - 😄 **Multiple Joke Sources** - Fetches from 9+ joke APIs
 - 🐳 **Docker Ready** - Full Docker setup with volume mounts
-- 🔧 **5 Tools**:
+- 🔧 **7 Tools**:
   - `get_random_joke` - Fetch a random dad joke and save it
   - `get_multiple_jokes` - Fetch multiple jokes at once
   - `get_all_jokes` - View all saved jokes
   - `clear_jokes` - Clear saved jokes
   - `get_joke_category` - Get jokes by category (Programming, Knock-knock, General, Chuck Norris)
+  - `fill_jokes_batch` - Ensure at least N jokes are stored
+  - `add_jokes` - Fetch and store N new jokes
 
 ## Quick Start
 
@@ -273,12 +285,14 @@ The file persists across container restarts due to Docker volume mounting.
 **Method:** `POST`
 
 **Headers:**
+
 - `Content-Type: application/json`
 - `Mcp-Session-Id` (response header - auto-generated)
 
 **Request Format:** JSON-RPC 2.0
 
 Example request body for calling a tool:
+
 ```json
 {
   "jsonrpc": "2.0",

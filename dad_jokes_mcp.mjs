@@ -195,6 +195,34 @@ app.post("/mcp", async (req, res) => {
                 required: ["category"],
               },
             },
+            {
+              name: "fill_jokes_batch",
+              description:
+                "Ensure at least N jokes are stored. Fetches new ones if needed, then returns them.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  count: {
+                    type: "number",
+                    description: "Desired number of jokes (default: 5, max: 20)",
+                  },
+                },
+              },
+            },
+            {
+              name: "add_jokes",
+              description:
+                "Fetch and store N new jokes, regardless of how many are already saved.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  count: {
+                    type: "number",
+                    description: "Number of new jokes to fetch and store (default: 5, max: 20)",
+                  },
+                },
+              },
+            },
           ],
         },
       };
@@ -280,6 +308,50 @@ app.post("/mcp", async (req, res) => {
             isError: true,
           };
         }
+      } else if (name === "add_jokes") {
+        const target = Math.min(args.count || 5, 20);
+        let added = 0;
+        for (let i = 0; i < target; i++) {
+          try {
+            const joke = await fetchRandomJoke();
+            if (!allJokes.includes(joke)) {
+              allJokes.unshift(joke);
+              added++;
+            }
+          } catch (err) {
+            console.error(`Error fetching joke ${i + 1}:`, err);
+          }
+        }
+        await saveJokes();
+        let msg = `➕ Added ${added} new joke(s) to pool (total: ${allJokes.length}):\n\n`;
+        const newJokes = allJokes.slice(0, added);
+        newJokes.forEach((joke, i) => {
+          msg += `${i + 1}. ${joke}\n\n`;
+        });
+        toolResponse = { content: [{ type: "text", text: msg.trim() }] };
+      } else if (name === "fill_jokes_batch") {
+        const target = Math.min(args.count || 5, 20);
+        const needed = target - allJokes.length;
+        if (needed > 0) {
+          console.log(`→ Fetching ${needed} joke(s) to reach batch size ${target}`);
+          for (let i = 0; i < needed; i++) {
+            try {
+              const joke = await fetchRandomJoke();
+              if (!allJokes.includes(joke)) {
+                allJokes.unshift(joke);
+              }
+            } catch (err) {
+              console.error(`Error fetching joke ${i + 1}:`, err);
+            }
+          }
+          await saveJokes();
+        }
+        const batch = allJokes.slice(0, target);
+        let msg = `📦 ${batch.length} Dad Jokes (pool: ${allJokes.length}):\n\n`;
+        batch.forEach((joke, i) => {
+          msg += `${i + 1}. ${joke}\n\n`;
+        });
+        toolResponse = { content: [{ type: "text", text: msg.trim() }] };
       } else {
         toolResponse = {
           error: { code: -32601, message: `Tool not found: ${name}` },
