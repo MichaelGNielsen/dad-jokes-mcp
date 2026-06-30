@@ -12,6 +12,8 @@
 | `get_joke_category` | Get joke from category | `category` (enum) | Joke from category | `@dad-jokes-mcp get_joke_category category=Programming` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_joke_category","arguments":{"category":"Programming"}}}'` |
 | `fill_jokes_batch` | Ensure at least N jokes are stored; fetches if needed | `count` (1-20, default: 5) | N jokes from pool | `@dad-jokes-mcp fill_jokes_batch count=10` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"fill_jokes_batch","arguments":{"count":10}}}'` |
 | `add_jokes` | Fetch and store N new jokes unconditionally | `count` (1-20, default: 5) | N new jokes added | `@dad-jokes-mcp add_jokes count=10` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add_jokes","arguments":{"count":10}}}'` |
+| `add_joke` | Add a custom joke manually | `text` (string) | Confirmation | `@dad-jokes-mcp add_joke text="Why..."` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add_joke","arguments":{"text":"Why did the chicken cross the road?"}}}'` |
+| `clean_jokes` | Remove null/empty entries from the pool | None | Cleanup result | `@dad-jokes-mcp clean_jokes` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"clean_jokes","arguments":{}}}'` |
 
 ## How MCP Tool Routing Works
 
@@ -81,6 +83,12 @@ if (name === "get_random_joke") {
   // Execute get_joke_category
 } else if (name === "fill_jokes_batch") {
   // Execute fill_jokes_batch
+} else if (name === "add_jokes") {
+  // Execute add_jokes
+} else if (name === "add_joke") {
+  // Execute add_joke
+} else if (name === "clean_jokes") {
+  // Execute clean_jokes
 } else if (name === "add_jokes") {
   // Execute add_jokes
 }
@@ -191,7 +199,7 @@ A Model Context Protocol (MCP) server that fetches and manages dad jokes via Str
 - 💾 **Persistent Storage** - Jokes automatically saved to `www/jokes.json`
 - 😄 **Multiple Joke Sources** - Fetches from 9+ joke APIs
 - 🐳 **Docker Ready** - Full Docker setup with volume mounts
-- 🔧 **8 Tools**:
+- 🔧 **10 Tools**:
   - `get_random_joke` - Fetch a random dad joke and save it
   - `get_multiple_jokes` - Fetch multiple jokes at once
   - `server_status` - View server status, version, and stats
@@ -200,6 +208,8 @@ A Model Context Protocol (MCP) server that fetches and manages dad jokes via Str
   - `get_joke_category` - Get jokes by category (Programming, Knock-knock, General, Chuck Norris)
   - `fill_jokes_batch` - Ensure at least N jokes are stored
   - `add_jokes` - Fetch and store N new jokes
+  - `add_joke` - Add a custom joke manually
+  - `clean_jokes` - Remove null/empty entries
 
 ## Quick Start
 

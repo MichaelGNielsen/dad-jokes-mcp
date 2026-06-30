@@ -20,6 +20,8 @@ Two edits in `dad_jokes_mcp.mjs`:
 | `get_joke_category` | Fetch from specific category |
 | `fill_jokes_batch` | Ensure pool has N jokes; fetch only if needed |
 | `add_jokes` | Fetch & store N new jokes unconditionally |
+| `add_joke` | Add a custom joke manually |
+| `clean_jokes` | Remove null/empty entries from pool |
 
 ## Project conventions
 
