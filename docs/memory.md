@@ -10,12 +10,20 @@ Persistent context across sessions. Update this file when you learn something ab
 
 ## Decisions
 
-<!-- notable decisions recorded here -->
+- Jokes stored as JSON array in `www/jokes.json` (not markdown, kept JSON)
+- Frontend: vanilla HTML/CSS/JS served as static files from Express
+- Category classification via simple keyword regex matching
+- `tools/call` uses lookup object pattern (not if/else chain)
+- `cleanJokes()` auto-runs on init and before every save
 
 ## Known issues
 
-<!-- unresolved bugs or pain points -->
+- Dedup `allJokes.includes()` is naive – same joke from different APIs won't match
+- Session ID is generated per-request but not used for state tracking
+- `/app/www` path is hardcoded – must match Docker WORKDIR
 
 ## Preferences
 
 - User prefers concise answers, minimal explanation
+- User communicates in Danish
+- Prefer Docker for running the server
