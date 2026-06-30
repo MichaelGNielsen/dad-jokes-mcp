@@ -2,16 +2,16 @@
 
 ## Available Tools
 
-| Tool Name | Description | Input | Output | Example |
-|-----------|-------------|-------|--------|----------|
-| `get_random_joke` | Dad jokes duh - Fetch a random dad joke and save it | None | Joke text | `@dad-jokes-mcp get_random_joke` |
-| `get_multiple_jokes` | Fetch multiple random dad jokes at once | `count` (1-20, default: 5) | Array of jokes | `@dad-jokes-mcp get_multiple_jokes count=10` |
-| `server_status` | Show server version, joke sources count, stored jokes, and tools | None | JSON status object | `@dad-jokes-mcp server_status` |
-| `get_all_jokes` | View all jokes stored in www/jokes.json | None | All saved jokes | `@dad-jokes-mcp get_all_jokes` |
-| `clear_jokes` | Delete all saved jokes | None | Confirmation message | `@dad-jokes-mcp clear_jokes` |
-| `get_joke_category` | Get joke from category | `category` (Programming, Knock-knock, General, Chuck Norris) | Joke from category | `@dad-jokes-mcp get_joke_category category=Programming` |
-| `fill_jokes_batch` | Ensure at least N jokes are stored; fetches new ones if needed | `count` (1-20, default: 5) | N jokes from pool | `@dad-jokes-mcp fill_jokes_batch count=10` |
-| `add_jokes` | Fetch and store N new jokes regardless of current pool size | `count` (1-20, default: 5) | N new jokes added | `@dad-jokes-mcp add_jokes count=10` |
+| Tool Name | Description | Input | Output | Example | curl |
+|-----------|-------------|-------|--------|----------|------|
+| `get_random_joke` | Fetch a random dad joke and save it | None | Joke text | `@dad-jokes-mcp get_random_joke` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_random_joke","arguments":{}}}'` |
+| `get_multiple_jokes` | Fetch multiple random dad jokes at once | `count` (1-20, default: 5) | Array of jokes | `@dad-jokes-mcp get_multiple_jokes count=10` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_multiple_jokes","arguments":{"count":10}}}'` |
+| `server_status` | Show server version, sources count, stored jokes, tools | None | JSON status | `@dad-jokes-mcp server_status` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"server_status","arguments":{}}}'` |
+| `get_all_jokes` | View all jokes stored in www/jokes.json | None | All saved jokes | `@dad-jokes-mcp get_all_jokes` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_all_jokes","arguments":{}}}'` |
+| `clear_jokes` | Delete all saved jokes | None | Confirmation | `@dad-jokes-mcp clear_jokes` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"clear_jokes","arguments":{}}}'` |
+| `get_joke_category` | Get joke from category | `category` (enum) | Joke from category | `@dad-jokes-mcp get_joke_category category=Programming` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_joke_category","arguments":{"category":"Programming"}}}'` |
+| `fill_jokes_batch` | Ensure at least N jokes are stored; fetches if needed | `count` (1-20, default: 5) | N jokes from pool | `@dad-jokes-mcp fill_jokes_batch count=10` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"fill_jokes_batch","arguments":{"count":10}}}'` |
+| `add_jokes` | Fetch and store N new jokes unconditionally | `count` (1-20, default: 5) | N new jokes added | `@dad-jokes-mcp add_jokes count=10` | `curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add_jokes","arguments":{"count":10}}}'` |
 
 ## How MCP Tool Routing Works
 
