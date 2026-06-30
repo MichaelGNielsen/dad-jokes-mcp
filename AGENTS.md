@@ -38,9 +38,16 @@ No restart needed with `npm run dev` (file watch).
 
 ## Testing
 
-No test framework. Manual tests via curl or the two JSON fixture files:
+No test framework. Use the test suite script:
+
+```bash
+./test_all.sh       # runs all tools via curl against localhost:5000
+```
+
+Or manual tests via curl with JSON fixture files:
 - `test.json` — initialize request
 - `test_call.json` — `tools/call get_random_joke`
+- `test_status.json` — `tools/call server_status`
 
 ```bash
 curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d @test.json
