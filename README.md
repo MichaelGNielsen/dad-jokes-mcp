@@ -233,6 +233,8 @@ Add to your MCP client config (Gemini, Page Assist, etc):
 
 ## Testing
 
+See [`docs/test.md`](docs/test.md) for the full test suite, JSON fixtures, and gotchas.
+
 ### Test with curl
 
 ```bash
