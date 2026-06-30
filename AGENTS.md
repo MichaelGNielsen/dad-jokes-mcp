@@ -61,3 +61,11 @@ curl -X POST http://localhost:5000/mcp -H "Content-Type: application/json" -d @t
 - Port defaults to 5000, overridable via `PORT` env var.
 - Hardcoded `/app/www` path — must match Docker `WORKDIR`.
 - Session ID is generated per-request but not used for state tracking.
+
+## Commit checklist
+
+After every change, before committing:
+1. **Docs** – Check if `AGENTS.md`, `README.md`, `docs/skills.md`, `docs/memory.md`, `docs/journal.md` need updating
+2. **Test** – Run `./test_all.sh` and confirm all pass
+3. **Rebuild** – Run `docker compose up -d --build` if server code changed
+4. **Commit & push** – When all green
