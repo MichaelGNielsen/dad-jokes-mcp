@@ -14,7 +14,7 @@ Persistent context across sessions. Update this file when you learn something ab
 - Frontend: vanilla HTML/CSS/JS served as static files from Express
 - Category classification via simple keyword regex matching
 - `tools/call` uses lookup object pattern (not if/else chain)
-- `cleanJokes()` auto-runs on init and before every save
+- `cleanJokes()` auto-runs on init and before every save – now also removes "Test joke from CI" entries
 
 ## Known issues
 

@@ -10,10 +10,12 @@ import path from "path";
 // Paths
 const WWW_DIR = "/app/www";
 const JOKES_FILE = path.join(WWW_DIR, "jokes.json");
+const CONFIG_FILE = path.join(WWW_DIR, "config.json");
 
 // In-memory storage for jokes
 let allJokes = [];
 let aiGatewayUrl = "http://nuc5:4042/v1/chat/completions";
+let aiModel = "default";
 
 // List of joke APIs
 const JOKE_SOURCES = [
@@ -28,18 +30,36 @@ const JOKE_SOURCES = [
   "https://api.jokes.one/jod",
 ];
 
-// Remove null/empty entries
+// Remove null/empty/test entries
 function cleanJokes() {
   const before = allJokes.length;
-  allJokes = allJokes.filter(j => j && (typeof j === "string" || (typeof j === "object" && j.text)) && (typeof j === "string" ? j.trim() : j.text.trim()));
+  allJokes = allJokes.filter(j => {
+    if (!j) return false;
+    const text = typeof j === "string" ? j : j.text;
+    if (!text || typeof text !== "string" || !text.trim()) return false;
+    if (text.includes("Test joke from CI")) return false;
+    return true;
+  });
   if (allJokes.length < before) {
-    console.log(`🧹 Cleaned ${before - allJokes.length} null/empty entries`);
+    console.log(`🧹 Cleaned ${before - allJokes.length} entries (pool: ${allJokes.length})`);
   }
 }
 
 // Initialize
 async function init() {
   await fs.mkdir(WWW_DIR, { recursive: true });
+
+  // Load config
+  try {
+    const configData = await fs.readFile(CONFIG_FILE, "utf-8");
+    const config = JSON.parse(configData);
+    if (config.aiGatewayUrl) aiGatewayUrl = config.aiGatewayUrl;
+    if (config.aiModel) aiModel = config.aiModel;
+    console.log(`✓ Loaded AI config: ${aiModel} @ ${aiGatewayUrl}`);
+  } catch (err) {
+    console.log("✓ No config file found, using defaults");
+  }
+
   try {
     const data = await fs.readFile(JOKES_FILE, "utf-8");
     const parsed = JSON.parse(data);
@@ -85,6 +105,16 @@ async function saveJokes() {
   }
 }
 
+// Save config to file
+async function saveConfig() {
+  try {
+    const config = { aiGatewayUrl, aiModel };
+    await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2));
+  } catch (err) {
+    console.error("✗ Error saving config:", err);
+  }
+}
+
 // Generate heading using AI
 async function generateHeading(text) {
   try {
@@ -92,7 +122,7 @@ async function generateHeading(text) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: aiModel,
         messages: [
           { role: "system", content: "You are a joke heading generator. Provide a short, catchy heading (2-5 words) for the joke provided. Only output the heading, nothing else." },
           { role: "user", content: text }
@@ -328,6 +358,42 @@ app.post("/mcp", async (req, res) => {
                 required: ["url"],
               },
             },
+            {
+              name: "list_ai_models",
+              description: "List available models from the AI Gateway.",
+              inputSchema: {
+                type: "object",
+                properties: {},
+              },
+            },
+            {
+              name: "set_ai_model",
+              description: "Set the AI model to use for generating headings.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  model: {
+                    type: "string",
+                    description: "The model ID (e.g., 'llama3', 'gpt-4o-mini')",
+                  },
+                },
+                required: ["model"],
+              },
+            },
+            {
+              name: "delete_joke",
+              description: "Delete a specific joke by its text content.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  text: {
+                    type: "string",
+                    description: "The exact text of the joke to delete",
+                  },
+                },
+                required: ["text"],
+              },
+            },
           ],
         },
       };
@@ -375,14 +441,29 @@ app.post("/mcp", async (req, res) => {
           return { content: [{ type: "text", text: msg.trim() }] };
         },
 
-        server_status: async () => ({
-          content: [{ type: "text", text: JSON.stringify({
-            server: "dad-jokes-mcp", version: "1.0.0",
-            protocol: "MCP 2024-11-05 (Streamable HTTP)",
-            jokeSources: JOKE_SOURCES.length, storedJokes: allJokes.length, tools: 11,
-            aiGatewayUrl
-          }, null, 2) }],
-        }),
+        server_status: async () => {
+          let resolvedModel = aiModel;
+          if (aiModel === "default") {
+            try {
+              const statusUrl = aiGatewayUrl.replace("/v1/chat/completions", "/api/status");
+              const resp = await fetch(statusUrl);
+              if (resp.ok) {
+                const status = await resp.json();
+                resolvedModel = `default (${status.active_model})`;
+              }
+            } catch (err) {
+              resolvedModel = "default (unknown)";
+            }
+          }
+          return {
+            content: [{ type: "text", text: JSON.stringify({
+              server: "dad-jokes-mcp", version: "1.0.0",
+              protocol: "MCP 2024-11-05 (Streamable HTTP)",
+              jokeSources: JOKE_SOURCES.length, storedJokes: allJokes.length, tools: 13,
+              aiGatewayUrl, aiModel: resolvedModel
+            }, null, 2) }],
+          };
+        },
 
         get_all_jokes: async () => {
           if (allJokes.length === 0) {
@@ -402,7 +483,7 @@ app.post("/mcp", async (req, res) => {
           const before = allJokes.length;
           cleanJokes();
           await saveJokes();
-          return { content: [{ type: "text", text: `🧹 Removed ${before - allJokes.length} null/empty entries (pool: ${allJokes.length})` }] };
+          return { content: [{ type: "text", text: `🧹 Removed ${before - allJokes.length} null/empty/test entries (pool: ${allJokes.length})` }] };
         },
 
         get_joke_category: async () => {
@@ -492,7 +573,35 @@ app.post("/mcp", async (req, res) => {
 
         set_ai_gateway: async () => {
           aiGatewayUrl = args.url;
-          return { content: [{ type: "text", text: `✅ AI Gateway URL set to: ${aiGatewayUrl}` }] };
+          await saveConfig();
+          return { content: [{ type: "text", text: `✅ AI Gateway URL set to: ${aiGatewayUrl} (saved)` }] };
+        },
+        list_ai_models: async () => {
+          try {
+            const modelsUrl = aiGatewayUrl.replace("/v1/chat/completions", "/v1/models");
+            const resp = await fetch(modelsUrl);
+            if (!resp.ok) throw new Error(`Gateway returned ${resp.status}`);
+            const data = await resp.json();
+            const models = data.data.map(m => m.id);
+            return { content: [{ type: "text", text: `Available models:\n- ${models.join("\n- ")}` }] };
+          } catch (err) {
+            return { content: [{ type: "text", text: `Error fetching models: ${err.message}` }], isError: true };
+          }
+        },
+        set_ai_model: async () => {
+          aiModel = args.model;
+          await saveConfig();
+          return { content: [{ type: "text", text: `✅ AI Model set to: ${aiModel} (saved)` }] };
+        },
+        delete_joke: async () => {
+          const text = args.text;
+          const before = allJokes.length;
+          allJokes = allJokes.filter(j => j.text !== text);
+          if (allJokes.length < before) {
+            await saveJokes();
+            return { content: [{ type: "text", text: `🗑 Deleted joke (pool: ${allJokes.length})` }] };
+          }
+          return { content: [{ type: "text", text: "Joke not found" }], isError: true };
         },
       };
 
@@ -552,4 +661,29 @@ Port:          ${PORT}
   server_instance.on("error", (err) => {
     console.error("💥 SERVER ERROR:", err);
   });
+
+  // Daily auto-fetch: 5 jokes every 24 hours
+  setInterval(async () => {
+    console.log("🕒 Running scheduled daily fetch (5 jokes)...");
+    try {
+      const added = [];
+      for (let i = 0; i < 5; i++) {
+        const text = await fetchRandomJoke();
+        if (!allJokes.some(j => j.text === text)) {
+          const heading = await generateHeading(text);
+          const jokeObj = { heading, text };
+          allJokes.unshift(jokeObj);
+          added.push(jokeObj);
+        }
+      }
+      if (added.length > 0) {
+        await saveJokes();
+        console.log(`✅ Scheduled fetch complete: Added ${added.length} new jokes.`);
+      } else {
+        console.log("ℹ️ Scheduled fetch complete: No new unique jokes found.");
+      }
+    } catch (err) {
+      console.error("✗ Error during scheduled fetch:", err.message);
+    }
+  }, 24 * 60 * 60 * 1000);
 });

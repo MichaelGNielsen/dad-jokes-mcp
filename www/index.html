@@ -56,8 +56,17 @@
   .joke-list li {
     background: #161b22; border: 1px solid #30363d; border-radius: 8px;
     padding: 0.75rem 1rem; font-size: 0.9375rem; line-height: 1.5;
-    white-space: pre-wrap;
+    white-space: pre-wrap; position: relative;
   }
+  .btn-delete {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    background: transparent; border: none; color: #484f58;
+    cursor: pointer; font-size: 1.25rem; line-height: 1;
+    padding: 0.25rem; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.2s, background 0.2s;
+  }
+  .btn-delete:hover { color: #f85149; background: #da363311; }
   .joke-list li .tag {
     display: inline-block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
     padding: 0.15rem 0.5rem; border-radius: 99px; margin-right: 0.5rem;
@@ -187,8 +196,10 @@ function render() {
     const tag = classify(jokeText);
     const body = escapeHtml(jokeText);
     const head = escapeHtml(heading);
+    const safeText = encodeURIComponent(jokeText);
     return `<li>
-      <div style="margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+      <button class="btn-delete" title="Delete joke" onclick="deleteJoke('${safeText}')">×</button>
+      <div style="margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding-right: 2rem;">
         <span style="font-weight: bold; color: #f0c040;">${head}</span>
         <span style="color: #484f58;">|</span>
         <span class="tag tag-${tag}">${tag}</span>
@@ -196,6 +207,18 @@ function render() {
       <div>${body}</div>
     </li>`;
   }).join("");
+}
+
+async function deleteJoke(encodedText) {
+  const text = decodeURIComponent(encodedText);
+  if (!confirm("Delete this joke?")) return;
+  try {
+    const result = await mcp("tools/call", { name: "delete_joke", arguments: { text } });
+    toast(result.content[0].text);
+    await loadJokes();
+  } catch (e) {
+    toast("Error: " + e.message, true);
+  }
 }
 
 function escapeHtml(s) {

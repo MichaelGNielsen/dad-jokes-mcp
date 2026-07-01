@@ -1,0 +1,4 @@
+{
+  "aiGatewayUrl": "http://nuc5:4042/v1/chat/completions",
+  "aiModel": "qwen3.6"
+}
