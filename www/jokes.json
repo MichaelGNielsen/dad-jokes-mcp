@@ -1,92 +1,422 @@
 [
-  "Test joke from CI 1782833715",
-  "Want to hear a chimney joke? Got stacks of em! First one's on the house",
-  "The generation of random numbers is too important to be left to chance.",
-  "Chuck Norris laughs at the \"four-hour erection\" warning that Viagra has to include in its ads: \"Hell, mine stays up for six hours at least without any pills!\"",
-  "Why did the developer break up with their keyboard? It just wasn't their type anymore.",
-  "I have a joke about Stack Overflow, but you would say it's a duplicate.",
-  "Chuck Norris can install iTunes without installing Quicktime.",
-  "Homeless people give money to Chuck Norris. The last time Chuck Norris went surfing off the coast of Florida he bit a shark. Chuck Norris doesn't have a problem with alcohol, alcohol has a problem with Chuck Norris. Jimmy Hoffa was last seen talking to Chuck Norris. Fish don't come out of the water because that's where Chuck Norris is. Chuck Norris was in Nagasaki and Hiroshima at the end of World War Two, there were no atom bombs. Christopher Columbus discovered America....because Chuck Norris told him to.",
-  "Chuck Norris assults your senses with a crowbar.",
-  "\"Honey, go to the store and buy some eggs.\"\n\"OK.\"\n\"Oh and while you're there, get some milk.\"\nHe never returned.",
-  "Why don't scientists trust atoms? Because they make up everything.",
-  "What do you call a troublesome Canadian high schooler? A poutine.",
-  "Why didn't the skeleton go for prom? Because it had nobody.",
-  "3 SQL statements walk into a NoSQL bar. Soon, they walk out They couldn't find a table.",
-  "Test joke from CI",
-  "Java is like Alzheimer's, it starts off slow, but eventually, your memory is gone.",
-  "Chuck Norris kicked-in The Amazing Kreskin's face. Thus proving a Chuck Norris attack to be an unpredictable life event.",
-  "Hey girl are you a school? Because I want to shoot some kids up inside of you.",
-  "In science, the hydrologic cycle is simply the process of Chuck Norris watering the garden to keep his feeding supply fresh.",
-  "Why do bees hum? Because they don't know the words.",
-  "Why did the developer go broke? They kept spending all their cache.",
-  "Knock knock. \n Who's there? \n A broken pencil. \n A broken pencil who? Never mind. It's pointless.",
-  "A guy walks into a bar and asks for 1.4 root beers.\nThe bartender says \"I'll have to charge you extra, that's a root beer float\".\nThe guy says \"In that case, better make it a double.\"",
-  "Chuck Norris once slam-dunked a supermarket against the side of a mountain.",
-  "A cobra once bit Chuck Norris. After five days of excruciating pain, the cobra died",
-  "Documentation is like sex:\nWhen it's good, it's very good.\nWhen it's bad, it's better than nothing...",
-  "What do you call a nervous javelin thrower? Shakespeare.",
-  "// This line doesn't actually do anything, but the code stops working when I delete it.",
-  "Did you hear about the Mexican train killer? He had loco motives",
-  "Chuck Norris's brain waves are suspected to be harmful to cell phones.",
-  "\"Knock, knock.\"\n\"Who's there?\"\n\n[very long pause]\n\n\"Java.\"",
-  "Have a great weekend!\nI hope your code behaves the same on Monday as it did on Friday.",
-  "The only thing that Chuck Norris can't do is smell his own farts.",
-  "Chuck Norris is the pricipal of the School Of Hard Knocks. Or as it's officially called, The Charles Norris Xavior's School For Gifted Bastard Offspring Of Lord Norris. It is responsible for all human death in the world.",
-  "Chuck Norris once sued Burger King after they refused to put razor wire in his Whopper Jr, insisting that that actually is \"his\" way.",
-  "Why did the opera singer go sailing? They wanted to hit the high Cs.",
-  "What do you call a group of killer whales playing instruments? An Orca-stra.",
-  "Chuck Norris can Supercharge an electric car.",
-  "Judge: \"I sentence you to the maximum punishment...\"\nMe (thinking): \"Please be death, please be death...\"\nJudge: \"Learn Java!\"\nMe: \"Damn.\"",
-  "Chuck Norris gives cigarettes cancer",
-  "If light is the fastest traveling element known, then Chuck Norris is not an element",
-  "If Bill Gates had a dime for every time Windows crashed ... Oh wait, he does.",
-  "Hey Girl,\nRoses are #ff0000,\nViolets are #0000ff,\nI use hex codes,\nBut I'd use RGB for you.",
-  "In Soviet Russia, gay sex gets you arrested. In America, getting arrested gets you gay sex.",
-  "Two C strings walk into a bar.\nThe bartender asks \"What can I get ya?\"\nThe first string says \"I'll have a gin and tonic.\"\nThe second string thinks for a minute, then says \"I'll take a tequila sunriseJF()#$JF(#)$(@J#()$@#())!*FNIN!OBN134ufh1ui34hf9813f8h8384h981h3984h5F!##@\"\nThe first string apologizes, \"You'll have to excuse my friend, he's not null-terminated.\"",
-  "Never date a baker. They're too kneady.",
-  "Did you hear about the chameleon who couldn't change color? They had a reptile dysfunction.",
-  "Why does Superman get invited to dinners? Because he is a Supperhero.",
-  "There is a sure cure for women unable to achieve orgasm -- fantasize about Chuck Norris.",
-  "Why did the developer quit his job? Because he didn't get arrays.",
-  "Debugging is like being the detective in a crime movie where you're also the murderer at the same time.",
-  "Eight bytes walk into a bar.\nThe bartender asks, \"Can I get you anything?\"\n\"Yeah,\" reply the bytes.\n\"Make us a double.\"",
-  "My girlfriend's dog died, so I tried to cheer her up by getting her an identical one. It just made her more upset. She screamed at me, \"What am I supposed to do with two dead dogs?\"",
-  "What’s brown and sounds like a bell? Dung!",
-  "A byte walks into a bar looking miserable.\nThe bartender asks it: \"What's wrong buddy?\"\n\"Parity error.\" it replies. \n\"Ah that makes sense, I thought you looked a bit off.\"",
-  "I've got a really good UDP joke to tell you but I don’t know if you'll get it.",
-  "Can I watch the TV? Yes, but don’t turn it on.",
-  "What is a centipedes's favorite Beatle song? I want to hold your hand, hand, hand, hand...",
-  "Did you hear the story about the cheese that saved the world? It was legend dairy.",
-  "Knock knock. \n Who's there? \n Opportunity. That is impossible. Opportunity doesn’t come knocking twice!",
-  "\"We messed up the keming again guys.\"",
-  "Chuck lives forever - You really want to know what happened to the dinosaurs? One of them made fun of Chuck Norris's 'stache.",
-  "Debugging: Removing the needles from the haystack.",
-  "Chuck Norris shits gold bars.",
-  "How come a man driving a train got struck by lightning? He was a good conductor.",
-  "What do vegetarian zombies eat? Grrrrrainnnnnssss.",
-  "If you see Chuck Norris picking his nose, it's best not to say anything.",
-  "How did Darth Vader know what Luke was getting for Christmas? He felt his presents.",
-  "Knock knock.\nWho's there?\nRecursion.\nRecursion who?\nKnock knock.",
-  "How good are you at Power Point? I Excel at it.",
-  "Algorithm: A word used by programmers when they don't want to explain how their code works.",
-  "What do you call a laughing motorcycle? A Yamahahahaha.",
-  "The glass is neither half-full nor half-empty, the glass is twice as big as it needs to be.",
-  "Your mama's so FAT she can't save files bigger than 4GB.",
-  "Chuck Norris possesses a commanding, cool-eyed stare that can make panties spontaneously combust.",
-  "Chuck Norris is the fifth Beatle.",
-  "What’s the advantage of living in Switzerland? Well, the flag is a big plus.",
-  "I got hit in the head by a soda can, but it didn't hurt that much... It was a soft drink.",
-  "Chuck Norris has slept with over 4,000 women. And of course by 'slept', he means Norrised.",
-  "ASCII silly question, get a silly ANSI.",
-  "Your momma is so fat, you need to switch to NTFS to store a picture of her.",
-  "What do you do when you see a space man? Park your car, man.",
-  "If Chuck Norris goes through a turnstile sideways, the new capitol of Thailand will \"Busted Turnstile\".",
-  "Where do rabbits go after they get married? On a bunny-moon.",
-  "When do doctors get angry? When they run out of patients.",
-  "Did you hear about the bread factory burning down? They say the business is toast.",
-  "Chuck Norris invented the bolt-action rifle, liquor, sexual intercourse, and football-- in that order.",
-  "In Hollywood, the abbreviation HD stands for Chuck Norris.",
-  "How do you tell HTML from HTML5?\n- Try it out in Internet Explorer\n- Did it work?\n- No?\n- It's HTML5.",
-  "Chuck Norris can understand women."
+  {
+    "heading": "Dad Joke",
+    "text": "What do you call a bee that can't make up its mind? A maybe."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Test joke from CI 1782899869"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris doesn't say 'who's your daddy', because he knows the answer."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "The six stages of debugging:\n1. That can't happen.\n2. That doesn't happen on my machine.\n3. That shouldn't happen.\n4. Why does that happen?\n5. Oh, I see.\n6. How did that ever work?"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "How do you steal a coat? You jacket."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "So I made a graph of all my past relationships. It has an ex axis and a why axis."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Is the pool safe for diving? It deep ends."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What type of music do balloons hate? Pop music!"
+  },
+  {
+    "heading": "En bar-vittighed",
+    "text": "En mand kommer ind på en bar og sætter sig ved disken. Han kigger sig omkring og ser, at baren udelukkende er fyldt med store, muskuløse kvindelige bodybuildere – og de er alle sammen blondiner.\n\nHan smiler og siger til bartenderen: \"Hey, vil du høre en rigtig god blondine-vittighed?\"\n\nBartenderen, som selv er en enorm, muskuløse blondine, læner sig frem over disken, kigger truende på ham og siger med dyb stemme:\n\"Hør her, makker. Inden du fortæller den joke, skal du lige vide noget. Jeg er blondine, løfter jern hver dag og vejer 100 kg. Udsmideren ved døren er blondine, tidligere wrestler og vejer 120 kg. Og kvinderne ved bordet bag dig er professionelle bodybuildere – og de er også blondiner. Er du helt sikker på, at du stadig tør fortælle den vittighed?\"\n\nManden tænker sig om et øjeblik, ryster på hovedet og siger:\n\"Nej, ved du hvad, glem det. Jeg orker ikke at skulle forklare den til jer alle sammen to gange.\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "In the age of the dinosaurs, \"comet\" was the nickname of Chuck Norris."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris silenced noise."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Saying that Java is nice because it works on every OS is like saying that anal sex is nice because it works on every gender."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris can play dubstep on a harp."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "How can you tell a vampire has a cold? They start coffin."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What do you call an Argentinian with a rubber toe? Roberto"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Test joke from CI 1782833715"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Want to hear a chimney joke? Got stacks of em! First one's on the house"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "The generation of random numbers is too important to be left to chance."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris laughs at the \"four-hour erection\" warning that Viagra has to include in its ads: \"Hell, mine stays up for six hours at least without any pills!\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Why did the developer break up with their keyboard? It just wasn't their type anymore."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "I have a joke about Stack Overflow, but you would say it's a duplicate."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris can install iTunes without installing Quicktime."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Homeless people give money to Chuck Norris. The last time Chuck Norris went surfing off the coast of Florida he bit a shark. Chuck Norris doesn't have a problem with alcohol, alcohol has a problem with Chuck Norris. Jimmy Hoffa was last seen talking to Chuck Norris. Fish don't come out of the water because that's where Chuck Norris is. Chuck Norris was in Nagasaki and Hiroshima at the end of World War Two, there were no atom bombs. Christopher Columbus discovered America....because Chuck Norris told him to."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris assults your senses with a crowbar."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "\"Honey, go to the store and buy some eggs.\"\n\"OK.\"\n\"Oh and while you're there, get some milk.\"\nHe never returned."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Why don't scientists trust atoms? Because they make up everything."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What do you call a troublesome Canadian high schooler? A poutine."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Why didn't the skeleton go for prom? Because it had nobody."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "3 SQL statements walk into a NoSQL bar. Soon, they walk out They couldn't find a table."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Test joke from CI"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Java is like Alzheimer's, it starts off slow, but eventually, your memory is gone."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris kicked-in The Amazing Kreskin's face. Thus proving a Chuck Norris attack to be an unpredictable life event."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Hey girl are you a school? Because I want to shoot some kids up inside of you."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "In science, the hydrologic cycle is simply the process of Chuck Norris watering the garden to keep his feeding supply fresh."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Why do bees hum? Because they don't know the words."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Why did the developer go broke? They kept spending all their cache."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Knock knock. \n Who's there? \n A broken pencil. \n A broken pencil who? Never mind. It's pointless."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "A guy walks into a bar and asks for 1.4 root beers.\nThe bartender says \"I'll have to charge you extra, that's a root beer float\".\nThe guy says \"In that case, better make it a double.\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris once slam-dunked a supermarket against the side of a mountain."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "A cobra once bit Chuck Norris. After five days of excruciating pain, the cobra died"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Documentation is like sex:\nWhen it's good, it's very good.\nWhen it's bad, it's better than nothing..."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What do you call a nervous javelin thrower? Shakespeare."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "// This line doesn't actually do anything, but the code stops working when I delete it."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Did you hear about the Mexican train killer? He had loco motives"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris's brain waves are suspected to be harmful to cell phones."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "\"Knock, knock.\"\n\"Who's there?\"\n\n[very long pause]\n\n\"Java.\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Have a great weekend!\nI hope your code behaves the same on Monday as it did on Friday."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "The only thing that Chuck Norris can't do is smell his own farts."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris is the pricipal of the School Of Hard Knocks. Or as it's officially called, The Charles Norris Xavior's School For Gifted Bastard Offspring Of Lord Norris. It is responsible for all human death in the world."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris once sued Burger King after they refused to put razor wire in his Whopper Jr, insisting that that actually is \"his\" way."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Why did the opera singer go sailing? They wanted to hit the high Cs."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What do you call a group of killer whales playing instruments? An Orca-stra."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris can Supercharge an electric car."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Judge: \"I sentence you to the maximum punishment...\"\nMe (thinking): \"Please be death, please be death...\"\nJudge: \"Learn Java!\"\nMe: \"Damn.\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris gives cigarettes cancer"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "If light is the fastest traveling element known, then Chuck Norris is not an element"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "If Bill Gates had a dime for every time Windows crashed ... Oh wait, he does."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Hey Girl,\nRoses are #ff0000,\nViolets are #0000ff,\nI use hex codes,\nBut I'd use RGB for you."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "In Soviet Russia, gay sex gets you arrested. In America, getting arrested gets you gay sex."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Two C strings walk into a bar.\nThe bartender asks \"What can I get ya?\"\nThe first string says \"I'll have a gin and tonic.\"\nThe second string thinks for a minute, then says \"I'll take a tequila sunriseJF()#$JF(#)$(@J#()$@#())!*FNIN!OBN134ufh1ui34hf9813f8h8384h981h3984h5F!##@\"\nThe first string apologizes, \"You'll have to excuse my friend, he's not null-terminated.\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Never date a baker. They're too kneady."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Did you hear about the chameleon who couldn't change color? They had a reptile dysfunction."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Why does Superman get invited to dinners? Because he is a Supperhero."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "There is a sure cure for women unable to achieve orgasm -- fantasize about Chuck Norris."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Why did the developer quit his job? Because he didn't get arrays."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Debugging is like being the detective in a crime movie where you're also the murderer at the same time."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Eight bytes walk into a bar.\nThe bartender asks, \"Can I get you anything?\"\n\"Yeah,\" reply the bytes.\n\"Make us a double.\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "My girlfriend's dog died, so I tried to cheer her up by getting her an identical one. It just made her more upset. She screamed at me, \"What am I supposed to do with two dead dogs?\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What’s brown and sounds like a bell? Dung!"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "A byte walks into a bar looking miserable.\nThe bartender asks it: \"What's wrong buddy?\"\n\"Parity error.\" it replies. \n\"Ah that makes sense, I thought you looked a bit off.\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "I've got a really good UDP joke to tell you but I don’t know if you'll get it."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Can I watch the TV? Yes, but don’t turn it on."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What is a centipedes's favorite Beatle song? I want to hold your hand, hand, hand, hand..."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Did you hear the story about the cheese that saved the world? It was legend dairy."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Knock knock. \n Who's there? \n Opportunity. That is impossible. Opportunity doesn’t come knocking twice!"
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "\"We messed up the keming again guys.\""
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck lives forever - You really want to know what happened to the dinosaurs? One of them made fun of Chuck Norris's 'stache."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Debugging: Removing the needles from the haystack."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris shits gold bars."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "How come a man driving a train got struck by lightning? He was a good conductor."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What do vegetarian zombies eat? Grrrrrainnnnnssss."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "If you see Chuck Norris picking his nose, it's best not to say anything."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "How did Darth Vader know what Luke was getting for Christmas? He felt his presents."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Knock knock.\nWho's there?\nRecursion.\nRecursion who?\nKnock knock."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "How good are you at Power Point? I Excel at it."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Algorithm: A word used by programmers when they don't want to explain how their code works."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What do you call a laughing motorcycle? A Yamahahahaha."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "The glass is neither half-full nor half-empty, the glass is twice as big as it needs to be."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Your mama's so FAT she can't save files bigger than 4GB."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris possesses a commanding, cool-eyed stare that can make panties spontaneously combust."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris is the fifth Beatle."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What’s the advantage of living in Switzerland? Well, the flag is a big plus."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "I got hit in the head by a soda can, but it didn't hurt that much... It was a soft drink."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris has slept with over 4,000 women. And of course by 'slept', he means Norrised."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "ASCII silly question, get a silly ANSI."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Your momma is so fat, you need to switch to NTFS to store a picture of her."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "What do you do when you see a space man? Park your car, man."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "If Chuck Norris goes through a turnstile sideways, the new capitol of Thailand will \"Busted Turnstile\"."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Where do rabbits go after they get married? On a bunny-moon."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "When do doctors get angry? When they run out of patients."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Did you hear about the bread factory burning down? They say the business is toast."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris invented the bolt-action rifle, liquor, sexual intercourse, and football-- in that order."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "In Hollywood, the abbreviation HD stands for Chuck Norris."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "How do you tell HTML from HTML5?\n- Try it out in Internet Explorer\n- Did it work?\n- No?\n- It's HTML5."
+  },
+  {
+    "heading": "Dad Joke",
+    "text": "Chuck Norris can understand women."
+  }
 ]

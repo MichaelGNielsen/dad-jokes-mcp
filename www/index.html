@@ -35,6 +35,14 @@
     border: 1px solid #30363d; border-radius: 6px;
     background: #0d1117; color: #c9d1d9; font-size: 0.875rem;
   }
+  .ai-config {
+    display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center;
+  }
+  .ai-config input {
+    flex: 1; padding: 0.5rem 0.75rem; border: 1px solid #30363d; border-radius: 6px;
+    background: #0d1117; color: #c9d1d9; font-size: 0.875rem;
+  }
+  .ai-config label { font-size: 0.875rem; color: #8b949e; }
   .add-row {
     display: flex; gap: 0.5rem; margin-bottom: 1rem;
   }
@@ -93,6 +101,12 @@
     <button id="btn-refresh">🔄</button>
   </div>
 
+  <div class="ai-config">
+    <label for="ai-url">AI GW:</label>
+    <input type="text" id="ai-url" placeholder="AI Gateway URL..." value="http://nuc5:4042/v1/chat/completions">
+    <button id="btn-set-ai">Set URL</button>
+  </div>
+
   <div class="add-row">
     <textarea id="joke-input" placeholder="Write your own joke..." rows="1"></textarea>
     <button class="primary" id="btn-add-joke">➕ Add</button>
@@ -141,8 +155,7 @@ async function loadJokes() {
     if (text.startsWith("No jokes")) {
       allJokes = [];
     } else {
-      const parts = text.split(/\n(?=\d+\. )/).slice(1);
-      allJokes = parts.map(p => p.replace(/^\d+\.\s*/, "").trim()).filter(Boolean);
+      allJokes = JSON.parse(text);
     }
     render();
   } catch (e) {
@@ -152,8 +165,9 @@ async function loadJokes() {
 
 function render() {
   const filtered = allJokes.filter(j => {
-    if (filterCategory && classify(j) !== filterCategory) return false;
-    if (filterText && !j.toLowerCase().includes(filterText.toLowerCase())) return false;
+    const jokeText = typeof j === 'string' ? j : j.text;
+    if (filterCategory && classify(jokeText) !== filterCategory) return false;
+    if (filterText && !jokeText.toLowerCase().includes(filterText.toLowerCase())) return false;
     return true;
   });
 
@@ -168,9 +182,19 @@ function render() {
   }
   empty.style.display = "none";
   list.innerHTML = filtered.map(j => {
-    const tag = classify(j);
-    const body = escapeHtml(j);
-    return `<li><span class="tag tag-${tag}">${tag}</span>${body}</li>`;
+    const jokeText = typeof j === 'string' ? j : j.text;
+    const heading = typeof j === 'string' ? 'Dad Joke' : j.heading;
+    const tag = classify(jokeText);
+    const body = escapeHtml(jokeText);
+    const head = escapeHtml(heading);
+    return `<li>
+      <div style="margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <span style="font-weight: bold; color: #f0c040;">${head}</span>
+        <span style="color: #484f58;">|</span>
+        <span class="tag tag-${tag}">${tag}</span>
+      </div>
+      <div>${body}</div>
+    </li>`;
   }).join("");
 }
 
@@ -244,6 +268,17 @@ function toast(msg, isError = false) {
   setTimeout(() => el.classList.remove("show"), 3000);
 }
 
+async function setAiUrl() {
+  const url = document.getElementById("ai-url").value.trim();
+  if (!url) return;
+  try {
+    const result = await mcp("tools/call", { name: "set_ai_gateway", arguments: { url } });
+    toast(result.content[0].text);
+  } catch (e) {
+    toast("Error: " + e.message, true);
+  }
+}
+
 document.getElementById("search").addEventListener("input", e => {
   filterText = e.target.value;
   render();
@@ -257,6 +292,7 @@ document.getElementById("btn-batch").addEventListener("click", () => batchAdd(5)
 document.getElementById("btn-clear").addEventListener("click", clearJokes);
 document.getElementById("btn-clean").addEventListener("click", cleanJokes);
 document.getElementById("btn-refresh").addEventListener("click", loadJokes);
+document.getElementById("btn-set-ai").addEventListener("click", setAiUrl);
 document.getElementById("btn-add-joke").addEventListener("click", addCustomJoke);
 document.getElementById("joke-input").addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addCustomJoke(); }
