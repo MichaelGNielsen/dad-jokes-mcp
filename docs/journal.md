@@ -25,4 +25,5 @@ Session log. Append entries with date and summary of changes made.
 - Opdateret `clean_jokes` MCP-tool til at inkludere dublet-fjernelse i beskrivelsen.
 - Sikret at `init()` gemmer `jokes.json` hvis dubletter findes ved opstart.
 - Rebuilt Docker image og verificeret deduplikering med test-data.
+- Opdateret `README.md` med information om kompatibilitet med MCP-klienter som Page Assist og Gemini.
 

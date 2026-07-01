@@ -1,4 +1,6 @@
 > **Agent instructions:** See [`AGENTS.md`](AGENTS.md) for architecture, commands, and how to add tools.
+>
+> **Note:** Denne MCP server er fuldt kompatibel med MCP-klienter der understøtter HTTP transport, herunder **Page Assist**, **Gemini**, og andre moderne AI-værktøjer.
 
 ## Available Tools
 
