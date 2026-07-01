@@ -30,14 +30,20 @@ const JOKE_SOURCES = [
   "https://api.jokes.one/jod",
 ];
 
-// Remove null/empty/test entries
+// Remove null/empty/test entries and duplicates
 function cleanJokes() {
   const before = allJokes.length;
+  const seen = new Set();
   allJokes = allJokes.filter(j => {
     if (!j) return false;
     const text = typeof j === "string" ? j : j.text;
     if (!text || typeof text !== "string" || !text.trim()) return false;
     if (text.includes("Test joke from CI")) return false;
+
+    const normalized = text.trim().toLowerCase();
+    if (seen.has(normalized)) return false;
+    seen.add(normalized);
+
     return true;
   });
   if (allJokes.length < before) {
@@ -69,7 +75,11 @@ async function init() {
       }
       return j;
     });
+    const before = allJokes.length;
     cleanJokes();
+    if (allJokes.length < before) {
+      await saveJokes();
+    }
     console.log(`✓ Loaded ${allJokes.length} jokes from file`);
 
     // Proactive heading generation for existing jokes with default heading
@@ -271,7 +281,7 @@ app.post("/mcp", async (req, res) => {
             },
             {
               name: "clean_jokes",
-              description: "Remove null/empty entries from the joke pool.",
+              description: "Remove null/empty entries and duplicate jokes from the pool.",
               inputSchema: {
                 type: "object",
                 properties: {},
@@ -483,7 +493,7 @@ app.post("/mcp", async (req, res) => {
           const before = allJokes.length;
           cleanJokes();
           await saveJokes();
-          return { content: [{ type: "text", text: `🧹 Removed ${before - allJokes.length} null/empty/test entries (pool: ${allJokes.length})` }] };
+          return { content: [{ type: "text", text: `🧹 Removed ${before - allJokes.length} null/empty/test/duplicate entries (pool: ${allJokes.length})` }] };
         },
 
         get_joke_category: async () => {

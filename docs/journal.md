@@ -21,4 +21,8 @@ Session log. Append entries with date and summary of changes made.
 - Opdateret Web UI med et "×" ikon på hver joke til manuel sletning.
 - Tilføjet `www/config.json` med `qwen3.6` som standard model for at undgå `thought_signature` fejl.
 - Implementeret en daglig baggrunds-opgave, der automatisk henter 5 nye jokes hver 24. time.
+- Opdateret `cleanJokes` til at identificere og fjerne dubletter baseret på normaliseret joke-tekst.
+- Opdateret `clean_jokes` MCP-tool til at inkludere dublet-fjernelse i beskrivelsen.
+- Sikret at `init()` gemmer `jokes.json` hvis dubletter findes ved opstart.
+- Rebuilt Docker image og verificeret deduplikering med test-data.
 
